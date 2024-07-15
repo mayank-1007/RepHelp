@@ -19,6 +19,7 @@ import SubmitButton from '@/components/SubmitButton';
 import { UserFormValidation } from "@/lib/validation"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { createUser } from "@/lib/actions/customer.actions"
 
 
 export enum FormFieldType {
@@ -27,6 +28,7 @@ export enum FormFieldType {
     PHONE_INPUT= 'phoneInput',
     CHECKBOX='checkbox',
     DATE_PICKER = 'datePicker',
+    DROPDOWN = 'dropdown',
     SELECT = 'select',
     SKELETON = 'skeleton',
 }
@@ -46,23 +48,27 @@ export default function CustomerForm() {
     },
   })
  
-  function onSubmit({name, email, phone}: z.infer<typeof UserFormValidation>) {
+  async function onSubmit({name, email, phone}: z.infer<typeof UserFormValidation>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     setIsLoading(true);
     try {
-      // const userData = {
-      //   name,
-      //   email,
-      //   phone,
-      // }
-      
-      // const user = await createUser(userData);
-      // if(user) router.push(`/customer/${user.$id}/register`)
+      const userData = {
+        name,
+        email,
+        phone,
+      }
+      console.log(userData);
+      const user = await createUser(userData);
+      if(user){
+        router.push(`/customer/${user.$id}/register`)
+        console.log(user);
+      }
     }
     catch(error) {
       console.log(error);
     }
+    setIsLoading(false);
   }
     return(
         <Form {...form}>

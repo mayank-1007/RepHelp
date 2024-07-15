@@ -20,8 +20,22 @@ export const CustomerFormValidation = z.object({
   phone: z
     .string()
     .refine((phone) => /^\+\d{10,15}$/.test(phone), "Invalid phone number"),
+  room_no: z.string(),
+  number_of_rooms: z.string(),
   birthDate: z.coerce.date(),
+  check_in: z.coerce.date().default(new Date()),
+  check_out: z.coerce.date(),
+  nationality: z.string(),
+  vehicle_no: z.string().optional(),
+  purpose: z.string(),
+  coming_from: z.string(),
+  going_to: z.string(),
+  identificationType: z.string(),
+  identificationNumber: z.string(),
+  identificationDocument: z.custom<File[]>().optional(),
+  customer_image: z.custom<File[]>().optional(),
   gender: z.enum(["Male", "Female", "Other"]),
+  signature: z.string().url("Incorrect URL"),
   address: z
     .string()
     .min(5, "Address must be at least 5 characters")
@@ -53,9 +67,6 @@ export const CustomerFormValidation = z.object({
   currentMedication: z.string().optional(),
   familyMedicalHistory: z.string().optional(),
   pastMedicalHistory: z.string().optional(),
-  identificationType: z.string().optional(),
-  identificationNumber: z.string().optional(),
-  identificationDocument: z.custom<File[]>().optional(),
   treatmentConsent: z
     .boolean()
     .default(false)
