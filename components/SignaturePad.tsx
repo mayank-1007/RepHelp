@@ -61,13 +61,13 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onSave }) => {
           canvasProps={{ width: 400, height: 200, className: 'signatureCanvas' }}
         />
         <br />
-        <Button onClick={handleSave}>Save Signature</Button>
-        <Button onClick={handleClear}>Clear Signature</Button>
+        <Button type="button" onClick={handleSave}>Save Signature</Button>
+        <Button type="button" onClick={handleClear}>Clear Signature</Button>
       </div>
       {signature && (
         <div>
           <h2>Export Signature:</h2>
-          <Button onClick={handleExport}>Export Signature as Image</Button>
+          <Button type="button" onClick={handleExport}>Export Signature as Image</Button>
         </div>
       )}
     </div>

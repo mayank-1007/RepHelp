@@ -151,6 +151,27 @@ export const StatusIcon = {
   cancelled: "/assets/icons/cancelled.svg",
 };
 
+export const roomTypes = [
+  'Single Room',
+  'Double Room',
+  'Twin Room',
+  'Triple Room',
+  'Suite',
+  'Deluxe Suite',
+  'Executive Suite',
+  'Penthouse Suite',
+  'Studio',
+  'Standard Room',
+  'Superior Room',
+  'Family Room',
+  'Junior Suite',
+  'Presidential Suite',
+  'Accessible Room',
+  'Cabin',
+  'Villa'
+];
+
+
 export const countries = [
   { label: 'Afghanistan', value: 'AF' },
   { label: 'Albania', value: 'AL' },

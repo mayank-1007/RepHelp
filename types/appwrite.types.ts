@@ -1,4 +1,5 @@
 import { Models } from "node-appwrite";
+import { RoomNumber } from '../constants/index';
 
 export interface Patient extends Models.Document {
   userId: string;
@@ -11,13 +12,6 @@ export interface Patient extends Models.Document {
   occupation: string;
   emergencyContactName: string;
   emergencyContactNumber: string;
-  primaryPhysician: string;
-  insuranceProvider: string;
-  insurancePolicyNumber: string;
-  allergies: string | undefined;
-  currentMedication: string | undefined;
-  familyMedicalHistory: string | undefined;
-  pastMedicalHistory: string | undefined;
   identificationType: string | undefined;
   identificationNumber: string | undefined;
   identificationDocument: FormData | undefined;
@@ -27,10 +21,11 @@ export interface Patient extends Models.Document {
 export interface Appointment extends Models.Document {
   patient: Patient;
   schedule: Date;
+  room_type: string;
   status: Status;
   primaryPhysician: string;
   reason: string;
-  note: string;
+  note: string | '';
   userId: string;
   cancellationReason: string | null;
 }

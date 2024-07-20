@@ -19,7 +19,7 @@ import CustomFormField from "../CustomFormField"
 import SubmitButton from '@/components/SubmitButton';
 import { UserFormValidation, CustomerFormValidation } from "@/lib/validation";
 import { useRouter } from "next/navigation"
-import { createUser } from "@/lib/actions/customer.actions"
+import { createUser, registerCustomer } from "@/lib/actions/customer.actions"
 import { FormFieldType } from "./CustomerForm"
 import { RadioGroup } from "../ui/radio-group"
 import { CustomerFormDefaultValues, GenderOptions } from "@/constants"
@@ -31,6 +31,7 @@ import { RadioGroupItem } from "../ui/radio-group"
 import CountrySelect from '../Nationality'
 import NestedDropdown from '../StateDistrict'
 import SignaturePad from '../SignaturePad'
+import Test from '../OrScan'
 import {
   Command,
   CommandEmpty,
@@ -70,21 +71,32 @@ export default function RegisterForm({user}:{user:User}) {
       name: "",
       email: "",
       phone: "",
-      room_no: "",
     },
   })
   const handleScanComplete = (data: any) => {
-    form.setValue('name', data.name);
-    form.setValue('identificationNumber', data.idNumber);
-    form.setValue('birthDate', data.dob);
-    form.setValue('address', data.address);
-    console.log(data);  
-    // Add other fields as needed
+    const currentValues = form.getValues();
+  
+    if (!currentValues.name) {
+      form.setValue('name', data.name.toUpperCase());
+    }
+    if (!currentValues.identificationNumber) {
+      form.setValue('identificationNumber', data.idNumber);
+    }
+    if (!currentValues.birthDate) {
+      form.setValue('birthDate', data.dob);
+    }
+    if (!currentValues.address) {
+      form.setValue('address', data.address);
+    }
+  
+    console.log(data);
+    // Add other fields as needed, checking if they are empty before setting the value
   };
+  
   const handleSave = (dataURL:any) => {
     // This function will receive the signature dataURL
     console.log('Signature saved:', dataURL);
-    setSelectedIdentificationType('dataUrl')
+    setSelectedIdentificationType(dataURL)
 
     // You can perform additional actions here, such as sending the dataURL to a server or storing it in state
   };
@@ -95,8 +107,8 @@ export default function RegisterForm({user}:{user:User}) {
 
  
   const onSubmit= async (values: z.infer<typeof CustomerFormValidation>) => {
-    // const {name, email, phone, room_no} = props;
-  
+    // const {name, email, phone, room_no} = props
+    console.log('by');
     setIsLoading(true);
     let formData;
     if(values.customer_image && values.customer_image.length > 0){
@@ -107,16 +119,27 @@ export default function RegisterForm({user}:{user:User}) {
       formData.append('blobFile', blobFile);
       formData.append('fileName', values.customer_image[0].name);
     }
+    
+    let customerformData;
+    if(values.identificationDocument && values.identificationDocument.length > 0){
+      const blobFile = new Blob([values.identificationDocument[0]], {
+        type: values.identificationDocument[0].type,
+      })
+      customerformData = new FormData();
+      customerformData.append('blobFile', blobFile);
+      customerformData.append('fileName', values.identificationDocument[0].name);
+    }
     try {
       const customerData = {
         ...values,
         userId: user.$id,
         birthDate: new Date(values.birthDate), 
         customer_image: formData, 
+        identificationDocument : customerformData
       }
-
-      // const customer = await registerCustomer(customerData);
-      // if(patient) router.push(`/customer/${user.$id}/new-booking`)
+      const customer = await registerCustomer(customerData);
+      console.log("hello");
+      router.push(`/customer/${user.$id}/new-booking`)
     }
     catch(error) {
       console.log(error);
@@ -139,7 +162,7 @@ export default function RegisterForm({user}:{user:User}) {
             fieldType={FormFieldType.INPUT}
             control={form.control}
             name="name"
-            label={`Full Name`}
+            label="Full Name"
             placeholder="Krishna"
             iconSrc="/assets/icons/user.svg"
             iconAlt="user"
@@ -298,7 +321,7 @@ export default function RegisterForm({user}:{user:User}) {
           />
         </div>
         <div className="flex flex-col gap-6 xl:flex-row">
-          <CustomFormField
+          {/* <CustomFormField
             fieldType={FormFieldType.SKELETON}
             control={form.control}
             name="nationality"
@@ -308,7 +331,23 @@ export default function RegisterForm({user}:{user:User}) {
                 <CountrySelect />
               </FormControl>
             )}
-          />
+          /> */}
+          <CustomFormField
+              fieldType={FormFieldType.SELECT}
+              control={form.control}
+              name="nationality"
+              label="Nationality"
+              placeholder="Select your nationality"
+              value=""
+          >
+            {countries.map((room) => (
+              <SelectItem key={room.value} value={room.label}>
+                <div className="flex cursor-pointer items-center gap-2">
+                  <p>{`${room.label}`}</p>
+                </div>
+              </SelectItem>
+            ))}
+          </CustomFormField>
           <CustomFormField
             fieldType={FormFieldType.INPUT}
             control={form.control}
@@ -417,6 +456,17 @@ export default function RegisterForm({user}:{user:User}) {
               </FormControl>
             )}
           />
+          {/* <CustomFormField
+            fieldType={FormFieldType.SKELETON}
+            control={form.control}
+            name="customer_image"
+            label="Customer Image"
+            renderSkeleton={(field) => (
+              <FormControl> */}
+                {/* <Test /> */}
+              {/* </FormControl>
+            )}
+          /> */}
           <CustomFormField
             fieldType={FormFieldType.SKELETON}
             control={form.control}
@@ -446,23 +496,20 @@ export default function RegisterForm({user}:{user:User}) {
             fieldType={FormFieldType.CHECKBOX}
             control={form.control}
             name="disclosureConsent"
-            label="I consent to the use and disclosure of my
-            information for government purposes."
+            label="I consent to the use and disclosure of my information for government purposes."
           />
 
           <CustomFormField
             fieldType={FormFieldType.CHECKBOX}
             control={form.control}
             name="privacyConsent"
-            label="I acknowledge that I have reviewed and agree to the
-            privacy policy"
+            label="I acknowledge that I have reviewed and agree to the privacy policy"
           />
         </section>
+        
 
         <SubmitButton isLoading={isLoading}>Welcome</SubmitButton>
       </form>
     </Form>
     )
 }
-
-

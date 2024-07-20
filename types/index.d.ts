@@ -18,24 +18,26 @@ declare type SearchParamProps = {
   }
   
   declare interface RegisterUserParams extends CreateUserParams {
-    userId: string;
-    birthDate: Date;
-    gender: Gender;
-    address: string;
-    occupation: string;
-    emergencyContactName: string;
-    emergencyContactNumber: string;
-    primaryPhysician: string;
-    insuranceProvider: string;
-    insurancePolicyNumber: string;
-    allergies: string | undefined;
-    currentMedication: string | undefined;
-    familyMedicalHistory: string | undefined;
-    pastMedicalHistory: string | undefined;
-    identificationType: string | undefined;
-    identificationNumber: string | undefined;
-    identificationDocument: FormData | undefined;
-    privacyConsent: boolean;
+    userId: string | undefined;
+    birthDate: Date | undefined;
+    number_of_rooms: string | undefined;
+    // coming_from: string | undefined;
+    // going_to: string | undefined;
+    gender: Gender | undefined;
+    address: string | undefined;
+    nationality: string | undefined | '';
+    vehicle_no?: string | '' | undefined;
+    purpose: string | '' | undefined;
+    occupation: string | undefined;
+    emergencyContactName: string | undefined;
+    emergencyContactNumber: string | undefined;
+    customer_image: formData | undefined;
+    check_in: Date | undefined;
+    check_out: Date | undefined;
+    identificationType: string | '' | undefined;
+    identificationNumber: string | '' | undefined;
+    identificationDocument: customerformData | undefined;
+    privacyConsent: boolean | undefined;
   }
   
   declare type CreateAppointmentParams = {
@@ -44,8 +46,9 @@ declare type SearchParamProps = {
     primaryPhysician: string;
     reason: string;
     schedule: Date;
+    room_type: string;
     status: Status;
-    note: string | undefined;
+    note: string | '';
   };
   
   declare type UpdateAppointmentParams = {

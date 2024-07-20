@@ -27,13 +27,11 @@ export const CustomerFormValidation = z.object({
   check_out: z.coerce.date(),
   nationality: z.string(),
   vehicle_no: z.string().optional(),
-  purpose: z.string(),
-  coming_from: z.string(),
-  going_to: z.string(),
+  purpose: z.string(),  
   identificationType: z.string(),
   identificationNumber: z.string(),
-  identificationDocument: z.custom<File[]>().optional(),
-  customer_image: z.custom<File[]>().optional(),
+  identificationDocument: z.custom<File[]>(),
+  customer_image: z.custom<File[]>(),
   gender: z.enum(["Male", "Female", "Other"]),
   signature: z.string().url("Incorrect URL"),
   address: z
@@ -63,22 +61,6 @@ export const CustomerFormValidation = z.object({
     .string()
     .min(2, "Policy number must be at least 2 characters")
     .max(50, "Policy number must be at most 50 characters"),
-  allergies: z.string().optional(),
-  currentMedication: z.string().optional(),
-  familyMedicalHistory: z.string().optional(),
-  pastMedicalHistory: z.string().optional(),
-  treatmentConsent: z
-    .boolean()
-    .default(false)
-    .refine((value) => value === true, {
-      message: "You must consent to treatment in order to proceed",
-    }),
-  disclosureConsent: z
-    .boolean()
-    .default(false)
-    .refine((value) => value === true, {
-      message: "You must consent to disclosure in order to proceed",
-    }),
   privacyConsent: z
     .boolean()
     .default(false)
@@ -90,6 +72,7 @@ export const CustomerFormValidation = z.object({
 export const CreateBookingSchema = z.object({
   primaryPhysician: z.string().min(2, "Select at least one doctor"),
   schedule: z.coerce.date(),
+  room_type: z.string(),
   reason: z
     .string()
     .min(2, "Reason must be at least 2 characters")

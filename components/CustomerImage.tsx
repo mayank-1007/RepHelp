@@ -54,7 +54,7 @@ const CapturePopover: React.FC = () => {
           <div className="w-full h-40 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center cursor-pointer dark:bg-gray-800 dark:border-gray-600" onClick={() => setShowPopover(true)}>
             {capturedImage || file ? (
               <div className="flex flex-col items-center">
-                {capturedImage && <Image src={capturedImage} alt="Captured" width={100} height={100} className="transform scale-x--1" />}
+                {capturedImage && <Image src={capturedImage} alt="Captured" width={100} height={100} className="transform scale-x-[-1]" />}
                 {file && <p className="text-white">{file.name}</p>}
                 <button onClick={handleRemoveImage} className="mt-2 bg-red-500 text-white py-1 px-3 rounded">
                   Remove Image
