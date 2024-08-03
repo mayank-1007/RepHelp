@@ -13,19 +13,23 @@ const AdminPage = async () => {
     <div className="mx-auto flex max-w-7xl flex-col space-y-14">
       <header className="admin-header max-h-[80px]">
         <Link href="/" className="cursor-pointer mt-7 mb-1">
-        <div className="flex flex-col gap-1 xl:flex-row">
-          <Image
-            src="/assets/icons/Logo.svg"
-            height={1000}
-            width={1000}
-            alt="logo"
-            className="h-14 w-fit"
-          />
-          <span className=" text-3xl font-bold font-italic mt-2 ml-5 mb-12 relative" >RepHelp</span>
-        </div>
+          <div className="flex flex-col gap-1 xl:flex-row">
+            <Image
+              src="/assets/icons/Logo.svg"
+              height={1000}
+              width={1000}
+              alt="logo"
+              className="h-14 w-fit"
+            />
+            <span className=" text-3xl font-bold font-italic mt-2 ml-5 mb-12 relative">
+              RepHelp
+            </span>
+          </div>
         </Link>
 
-        <Link href="/master-admin"  className="mb-2 text-16-semibold">Admin Dashboard</Link>
+        <Link href="/master-admin" className="mb-2 text-16-semibold">
+          Admin Dashboard
+        </Link>
       </header>
 
       <main className="admin-main">

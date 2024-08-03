@@ -19,9 +19,11 @@ export default function Home({ searchParams }: SearchParamProps) {
               alt="reception"
               className="-ml-2 mb-12 h-14 w-16 flex"
             />
-            <span className=" text-3xl font-bold font-italic ml-5 mb-12 relative" >RepHelp</span>
+            <span className=" text-3xl font-bold font-italic ml-5 mb-12 relative">
+              RepHelp
+            </span>
           </div>
-          <CustomerForm/>
+          <CustomerForm />
 
           <div className="text-14-regular mt-20 flex justify-between ">
             <p className="justify-items-end text-dark-500 xl:text-left">

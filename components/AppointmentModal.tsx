@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Appointment } from "@/types/appwrite.types";
 
-import { AppointmentForm } from './form/AppointmentForm';
+import { AppointmentForm } from "./form/AppointmentForm";
 
 import "react-datepicker/dist/react-datepicker.css";
 

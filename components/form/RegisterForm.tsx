@@ -1,10 +1,10 @@
-"use client"
-import React, { useState, ChangeEvent  } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { Check, ChevronsUpDown } from "lucide-react"
-import { z } from "zod"
-import { Button } from "@/components/ui/button"
+"use client";
+import React, { useState, ChangeEvent } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -13,54 +13,62 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import CustomFormField from "../CustomFormField"
-import SubmitButton from '@/components/SubmitButton';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import CustomFormField from "../CustomFormField";
+import SubmitButton from "@/components/SubmitButton";
 import { UserFormValidation, CustomerFormValidation } from "@/lib/validation";
-import { useRouter } from "next/navigation"
-import { createUser, registerCustomer } from "@/lib/actions/customer.actions"
-import { FormFieldType } from "./CustomerForm"
-import { RadioGroup } from "../ui/radio-group"
-import { CustomerFormDefaultValues, GenderOptions } from "@/constants"
-import {RoomNumber, Doctors, Identificationtypes, countries, PurposeOptions, NumberOfRooms} from "@/constants"
-import Image from 'next/image'
-import { Label } from '@/components/ui/label';
-import { FileUploader } from "../FileUploader"
-import { RadioGroupItem } from "../ui/radio-group"
-import CountrySelect from '../Nationality'
-import NestedDropdown from '../StateDistrict'
-import SignaturePad from '../SignaturePad'
-import Test from '../OrScan'
+import { useRouter } from "next/navigation";
+import { createUser, registerCustomer } from "@/lib/actions/customer.actions";
+import { FormFieldType } from "./CustomerForm";
+import { RadioGroup } from "../ui/radio-group";
+import { CustomerFormDefaultValues, GenderOptions } from "@/constants";
+import {
+  RoomNumber,
+  Doctors,
+  Identificationtypes,
+  countries,
+  PurposeOptions,
+  NumberOfRooms,
+} from "@/constants";
+import Image from "next/image";
+import { Label } from "@/components/ui/label";
+import { FileUploader } from "../FileUploader";
+import { RadioGroupItem } from "../ui/radio-group";
+import CountrySelect from "../Nationality";
+import NestedDropdown from "../StateDistrict";
+import SignaturePad from "../SignaturePad";
+import Test from "../OrScan";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import {cn} from '@/lib/utils'
-import Dropdown from 'react-dropdown';
-import { Option } from "lucide-react"
-import 'react-dropdown/style.css';
-import { Options } from "next/dist/server/base-server"
-import { SelectItem } from "@radix-ui/react-select"
-import CapturePopover from "../CustomerImage"
-import {DocumentScanPopover} from "../DocumentImage"
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import Dropdown from "react-dropdown";
+import { Option } from "lucide-react";
+import "react-dropdown/style.css";
+import { Options } from "next/dist/server/base-server";
+import { SelectItem } from "@radix-ui/react-select";
+import CapturePopover from "../CustomerImage";
+import { DocumentScanPopover } from "../DocumentImage";
+import Link from "next/link";
 // import { toast } from "@/components/ui/use-toast"
 
-const getCurrentDate=(): Date => {
+const getCurrentDate = (): Date => {
   return new Date();
-}
+};
 
- 
-export default function RegisterForm({user}:{user:User}) {
-  const [selectedIdentificationType, setSelectedIdentificationType] = useState("");
+export default function RegisterForm({ user }: { user: User }) {
+  const [selectedIdentificationType, setSelectedIdentificationType] =
+    useState("");
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   // 1. Define your form.
@@ -72,31 +80,31 @@ export default function RegisterForm({user}:{user:User}) {
       email: "",
       phone: "",
     },
-  })
+  });
   const handleScanComplete = (data: any) => {
     const currentValues = form.getValues();
-  
+
     if (!currentValues.name) {
-      form.setValue('name', data.name.toUpperCase());
+      form.setValue("name", data.name.toUpperCase());
     }
     if (!currentValues.identificationNumber) {
-      form.setValue('identificationNumber', data.idNumber);
+      form.setValue("identificationNumber", data.idNumber);
     }
     if (!currentValues.birthDate) {
-      form.setValue('birthDate', data.dob);
+      form.setValue("birthDate", data.dob);
     }
     if (!currentValues.address) {
-      form.setValue('address', data.address);
+      form.setValue("address", data.address);
     }
-  
+
     console.log(data);
     // Add other fields as needed, checking if they are empty before setting the value
   };
-  
-  const handleSave = (dataURL:any) => {
+
+  const handleSave = (dataURL: any) => {
     // This function will receive the signature dataURL
-    console.log('Signature saved:', dataURL);
-    setSelectedIdentificationType(dataURL)
+    console.log("Signature saved:", dataURL);
+    setSelectedIdentificationType(dataURL);
 
     // You can perform additional actions here, such as sending the dataURL to a server or storing it in state
   };
@@ -105,70 +113,79 @@ export default function RegisterForm({user}:{user:User}) {
     setSelectedIdentificationType(event);
   };
 
- 
-  const onSubmit= async (values: z.infer<typeof CustomerFormValidation>) => {
+  const onSubmit = async (values: z.infer<typeof CustomerFormValidation>) => {
     // const {name, email, phone, room_no} = props
-    console.log('by');
+    console.log("by");
     setIsLoading(true);
     let formData;
-    if(values.customer_image && values.customer_image.length > 0){
+    if (values.customer_image && values.customer_image.length > 0) {
       const blobFile = new Blob([values.customer_image[0]], {
         type: values.customer_image[0].type,
-      })
+      });
       formData = new FormData();
-      formData.append('blobFile', blobFile);
-      formData.append('fileName', values.customer_image[0].name);
+      formData.append("blobFile", blobFile);
+      formData.append("fileName", values.customer_image[0].name);
     }
-    
+
     let customerformData;
-    if(values.identificationDocument && values.identificationDocument.length > 0){
+    if (
+      values.identificationDocument &&
+      values.identificationDocument.length > 0
+    ) {
       const blobFile = new Blob([values.identificationDocument[0]], {
         type: values.identificationDocument[0].type,
-      })
+      });
       customerformData = new FormData();
-      customerformData.append('blobFile', blobFile);
-      customerformData.append('fileName', values.identificationDocument[0].name);
+      customerformData.append("blobFile", blobFile);
+      customerformData.append(
+        "fileName",
+        values.identificationDocument[0].name,
+      );
     }
     try {
       const customerData = {
         ...values,
         userId: user.$id,
-        birthDate: new Date(values.birthDate), 
-        customer_image: formData, 
-        identificationDocument : customerformData
-      }
+        birthDate: new Date(values.birthDate),
+        customer_image: formData,
+        identificationDocument: customerformData,
+      };
       const customer = await registerCustomer(customerData);
-      console.log("hello");
-      router.push(`/customer/${user.$id}/new-booking`)
-    }
-    catch(error) {
+      console.log(customerData);
+      router.push(`/admin`);
+    } catch (error) {
       console.log(error);
     }
     setIsLoading(false);
-  }
-    return(
+  };
+  return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-12 flex-1">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-12 flex-1"
+      >
         <section className="space-y-4">
-            <h1  className="header">Welcome 👋</h1>
-            <p  className="text-dark-700">Let&apos;s Add some more of your details</p>
+          <h1 className="header">Welcome 👋</h1>
+          <p className="text-dark-700">
+            Let&apos;s Add some more of your details
+          </p>
         </section>
         <section className="space-y-6">
-          <div className="mb-9 space-y-1">            
-          <h2  className="sub-header">Personal Information</h2>
+          <div className="mb-9 space-y-1">
+            <h2 className="sub-header">Personal Information</h2>
           </div>
         </section>
         <CustomFormField
-            fieldType={FormFieldType.INPUT}
-            control={form.control}
-            name="name"
-            label="Full Name"
-            placeholder="Krishna"
-            iconSrc="/assets/icons/user.svg"
-            iconAlt="user"
+          fieldType={FormFieldType.INPUT}
+          control={form.control}
+          name="name"
+          label="Full Name"
+          placeholder="Krishna"
+          iconSrc="/assets/icons/user.svg"
+          iconAlt="user"
         />
         <div className="flex flex-col gap-6 xl:flex-row">
-        <CustomFormField
+          <CustomFormField
             fieldType={FormFieldType.INPUT}
             control={form.control}
             name="email"
@@ -176,8 +193,8 @@ export default function RegisterForm({user}:{user:User}) {
             placeholder="krishna2005@gmail.com"
             iconSrc="/assets/icons/email.svg"
             iconAlt="email"
-        />
-        <CustomFormField
+          />
+          <CustomFormField
             fieldType={FormFieldType.PHONE_INPUT}
             control={form.control}
             name="phone"
@@ -185,17 +202,17 @@ export default function RegisterForm({user}:{user:User}) {
             placeholder="(+91) 8595673410"
             iconSrc="/assets/icons/email.svg"
             iconAlt="email"
-        />
+          />
         </div>
         <div className="flex flex-col gap-6 xl:flex-row">
-        <CustomFormField
+          <CustomFormField
             fieldType={FormFieldType.DATE_PICKER}
             control={form.control}
             name="birthDate"
             label="DOB"
             placeholder="dd/mm/yyyy"
-        />
-        <CustomFormField
+          />
+          <CustomFormField
             fieldType={FormFieldType.SKELETON}
             control={form.control}
             name="gender"
@@ -203,18 +220,23 @@ export default function RegisterForm({user}:{user:User}) {
             placeholder="Male"
             renderSkeleton={(field) => (
               <FormControl>
-                <RadioGroup className="flex h-11 gap-6 xl:justify-between" onValueChange={field.onChange} defaultValue={field.value}>
-                  {GenderOptions.map((option) =>(
+                <RadioGroup
+                  className="flex h-11 gap-6 xl:justify-between"
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  {GenderOptions.map((option) => (
                     <div key={option} className="radio-group">
                       <RadioGroupItem value={option} />
-                      <Label htmlFor={option} className="cursor-pointer">{option}</Label>
+                      <Label htmlFor={option} className="cursor-pointer">
+                        {option}
+                      </Label>
                     </div>
                   ))}
                 </RadioGroup>
               </FormControl>
             )}
-        />        
-      
+          />
         </div>
         {/* <CustomFormField
             fieldType={FormFieldType.SELECT}
@@ -231,38 +253,38 @@ export default function RegisterForm({user}:{user:User}) {
               </SelectItem>
             ))}
           </CustomFormField> */}
-          <div className="flex flex-col gap-6 xl:flex-row">
+        <div className="flex flex-col gap-6 xl:flex-row">
           <CustomFormField
             fieldType={FormFieldType.TEXTAREA}
             control={form.control}
             name="address"
             label="Adress"
             placeholder="46th Street, Banglore"
-        />
-        <CustomFormField
+          />
+          <CustomFormField
             fieldType={FormFieldType.INPUT}
             control={form.control}
             name="occupation"
             label="Occupation"
             placeholder="Software Engineer"
-        />
-          </div>
-          <div className="flex flex-col gap-6 xl:flex-row">
+          />
+        </div>
+        <div className="flex flex-col gap-6 xl:flex-row">
           <CustomFormField
             fieldType={FormFieldType.INPUT}
             control={form.control}
             name="emergencyContactName"
             label="Emergency Contact"
             placeholder="Gaurdian's name"
-        />
-        <CustomFormField
+          />
+          <CustomFormField
             fieldType={FormFieldType.PHONE_INPUT}
             control={form.control}
             name="emergencyContactNumber"
             label="Emergency Contact Number"
             placeholder="80908088098"
-        />
-          </div>
+          />
+        </div>
 
         <section className="space-y-6">
           <div className="mb-9 space-y-1">
@@ -270,13 +292,13 @@ export default function RegisterForm({user}:{user:User}) {
           </div>
         </section>
         <div className="flex flex-col gap-6 xl:flex-row">
-        <CustomFormField
-              fieldType={FormFieldType.SELECT}
-              control={form.control}
-              name="number_of_rooms"
-              label="Number of Rooms"
-              placeholder="Select the number of rooms"
-              value="1"
+          <CustomFormField
+            fieldType={FormFieldType.SELECT}
+            control={form.control}
+            name="number_of_rooms"
+            label="Number of Rooms"
+            placeholder="Select the number of rooms"
+            value="1"
           >
             {NumberOfRooms.map((room) => (
               <SelectItem key={room} value={room}>
@@ -287,37 +309,37 @@ export default function RegisterForm({user}:{user:User}) {
             ))}
           </CustomFormField>
           <CustomFormField
-              fieldType={FormFieldType.SELECT}
-              control={form.control}
-              name="room_no"
-              label="Room Number"
-              placeholder="Select Room Number"
-              value=""
+            fieldType={FormFieldType.SELECT}
+            control={form.control}
+            name="room_no"
+            label="Room Number"
+            placeholder="Select Room Number"
+            value=""
           >
             {RoomNumber.map((room) => (
-              <SelectItem key={room.name} value={room.name+" "+room.type}>
+              <SelectItem key={room.name} value={room.name + " " + room.type}>
                 <div className="flex cursor-pointer items-center gap-2">
                   <p>{`${room.name} (${room.type})`}</p>
                 </div>
               </SelectItem>
             ))}
           </CustomFormField>
-        </div> 
+        </div>
         <div className="flex flex-col gap-6 xl:flex-row">
           <CustomFormField
-              fieldType={FormFieldType.DATE_PICKER}
-              control={form.control}
-              name="check_in"
-              label="Check In Date"
-              placeholder="dd/mm/yyyy"
-              value = {getCurrentDate().toISOString()}
+            fieldType={FormFieldType.DATE_PICKER}
+            control={form.control}
+            name="check_in"
+            label="Check In Date"
+            placeholder="dd/mm/yyyy"
+            value={getCurrentDate().toISOString()}
           />
           <CustomFormField
-              fieldType={FormFieldType.DATE_PICKER}
-              control={form.control}
-              name="check_out"
-              label="Expected Check out Date"
-              placeholder="dd/mm/yyyy"
+            fieldType={FormFieldType.DATE_PICKER}
+            control={form.control}
+            name="check_out"
+            label="Expected Check out Date"
+            placeholder="dd/mm/yyyy"
           />
         </div>
         <div className="flex flex-col gap-6 xl:flex-row">
@@ -333,12 +355,12 @@ export default function RegisterForm({user}:{user:User}) {
             )}
           /> */}
           <CustomFormField
-              fieldType={FormFieldType.SELECT}
-              control={form.control}
-              name="nationality"
-              label="Nationality"
-              placeholder="Select your nationality"
-              value=""
+            fieldType={FormFieldType.SELECT}
+            control={form.control}
+            name="nationality"
+            label="Nationality"
+            placeholder="Select your nationality"
+            value=""
           >
             {countries.map((room) => (
               <SelectItem key={room.value} value={room.label}>
@@ -354,11 +376,11 @@ export default function RegisterForm({user}:{user:User}) {
             name="vehicle_no"
             label="Vehicle Number"
             placeholder="Vehicle Number"
-          />                    
+          />
         </div>
 
         <div className="flex flex-col gap-6 xl:flex-row">
-        <CustomFormField
+          <CustomFormField
             fieldType={FormFieldType.SKELETON}
             control={form.control}
             name="purpose"
@@ -366,20 +388,26 @@ export default function RegisterForm({user}:{user:User}) {
             placeholder="official"
             renderSkeleton={(field) => (
               <FormControl>
-                <RadioGroup className="flex h-11 gap-6 xl:justify-between" onValueChange={field.onChange} defaultValue={field.value}>
-                  {PurposeOptions.map((option) =>(
+                <RadioGroup
+                  className="flex h-11 gap-6 xl:justify-between"
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  {PurposeOptions.map((option) => (
                     <div key={option} className="radio-group">
                       <RadioGroupItem value={option} />
-                      <Label htmlFor={option} className="cursor-pointer">{option}</Label>
+                      <Label htmlFor={option} className="cursor-pointer">
+                        {option}
+                      </Label>
                     </div>
                   ))}
                 </RadioGroup>
               </FormControl>
             )}
-        /> 
+          />
         </div>
-         <div className="flex-box">
-         <CustomFormField
+        <div className="flex-box">
+          <CustomFormField
             fieldType={FormFieldType.SKELETON}
             control={form.control}
             name="coming_from"
@@ -401,8 +429,7 @@ export default function RegisterForm({user}:{user:User}) {
               </FormControl>
             )}
           />
-          
-         </div>
+        </div>
 
         <section className="space-y-6">
           <div className="mb-9 space-y-1">
@@ -416,16 +443,15 @@ export default function RegisterForm({user}:{user:User}) {
             label="Identification Type"
             placeholder="Select identification type"
             onChange={handleIdentificationTypeChange}
-            value = ""
+            value=""
           >
             {Identificationtypes.map((type, i) => (
               <SelectItem key={type + i} value={type}>
                 {type}
-              </SelectItem>              
+              </SelectItem>
             ))}
-            
           </CustomFormField>
-          
+
           <CustomFormField
             fieldType={FormFieldType.INPUT}
             control={form.control}
@@ -463,8 +489,8 @@ export default function RegisterForm({user}:{user:User}) {
             label="Customer Image"
             renderSkeleton={(field) => (
               <FormControl> */}
-                {/* <Test /> */}
-              {/* </FormControl>
+          {/* <Test /> */}
+          {/* </FormControl>
             )}
           /> */}
           <CustomFormField
@@ -506,10 +532,15 @@ export default function RegisterForm({user}:{user:User}) {
             label="I acknowledge that I have reviewed and agree to the privacy policy"
           />
         </section>
-        
 
-        <SubmitButton isLoading={isLoading}>Welcome</SubmitButton>
+        <Link
+          type="submit"
+          href={`/admin`}
+          onClick={form.handleSubmit(onSubmit)}
+        >
+          ikfikejnj
+        </Link>
       </form>
     </Form>
-    )
+  );
 }

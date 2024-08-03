@@ -1,5 +1,5 @@
 // import React, { useState } from 'react';
-// import QrReader, { QrReaderProps } from 'react-qr-reader'; 
+// import QrReader, { QrReaderProps } from 'react-qr-reader';
 // import Tesseract from 'tesseract.js';
 
 // interface IdentityData {

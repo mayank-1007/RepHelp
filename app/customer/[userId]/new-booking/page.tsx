@@ -1,7 +1,7 @@
 import Image from "next/image";
 
-import { AppointmentForm } from '@/components/form/AppointmentForm';
-import { getCustomer } from '@/lib/actions/customer.actions';
+import { AppointmentForm } from "@/components/form/AppointmentForm";
+import { getCustomer } from "@/lib/actions/customer.actions";
 
 const Appointment = async ({ params: { userId } }: SearchParamProps) => {
   const patient = await getCustomer(userId);
@@ -18,7 +18,9 @@ const Appointment = async ({ params: { userId } }: SearchParamProps) => {
               alt="reception"
               className="-ml-2 mb-12 h-14 w-16 flex"
             />
-            <span className=" text-3xl font-bold font-italic ml-5 mb-12 relative" >RepHelp</span>
+            <span className=" text-3xl font-bold font-italic ml-5 mb-12 relative">
+              RepHelp
+            </span>
           </div>
 
           <AppointmentForm

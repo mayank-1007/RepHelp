@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Doctors } from "@/constants";
-import { getAppointment } from '@/lib/actions/appointment.actions';
+import { getAppointment } from "@/lib/actions/appointment.actions";
 import { formatDateTime } from "@/lib/utils";
 
 const RequestSuccess = async ({
@@ -14,7 +14,7 @@ const RequestSuccess = async ({
   const appointment = await getAppointment(appointmentId);
 
   const doctor = Doctors.find(
-    (doctor) => doctor.name === appointment.primaryPhysician
+    (doctor) => doctor.name === appointment.primaryPhysician,
   );
 
   return (
@@ -68,9 +68,7 @@ const RequestSuccess = async ({
         </section>
 
         <Button variant="outline" className="shad-primary-btn" asChild>
-          <Link href={`/customer/${userId}/new-booking`}>
-            New Appointment
-          </Link>
+          <Link href={`/customer/${userId}/new-booking`}>New Appointment</Link>
         </Button>
 
         <p className="copyright">© 2024 Rephelp</p>

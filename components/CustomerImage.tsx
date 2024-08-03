@@ -1,8 +1,12 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
-import Webcam from 'react-webcam';
+import React, { useState, useRef, useCallback } from "react";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import Webcam from "react-webcam";
 import Image from "next/image";
-import { Input } from '@/components/ui/input';
+import { Input } from "@/components/ui/input";
 
 const CapturePopover: React.FC = () => {
   const [showPopover, setShowPopover] = useState(false);
@@ -51,20 +55,39 @@ const CapturePopover: React.FC = () => {
     <div className="p-4">
       <Popover>
         <PopoverTrigger asChild>
-          <div className="w-full h-40 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center cursor-pointer dark:bg-gray-800 dark:border-gray-600" onClick={() => setShowPopover(true)}>
+          <div
+            className="w-full h-40 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center cursor-pointer dark:bg-gray-800 dark:border-gray-600"
+            onClick={() => setShowPopover(true)}
+          >
             {capturedImage || file ? (
               <div className="flex flex-col items-center">
-                {capturedImage && <Image src={capturedImage} alt="Captured" width={100} height={100} className="transform scale-x-[-1]" />}
+                {capturedImage && (
+                  <Image
+                    src={capturedImage}
+                    alt="Captured"
+                    width={100}
+                    height={100}
+                    className="transform scale-x-[-1]"
+                  />
+                )}
                 {file && <p className="text-white">{file.name}</p>}
-                <button onClick={handleRemoveImage} className="mt-2 bg-red-500 text-white py-1 px-3 rounded">
+                <button
+                  onClick={handleRemoveImage}
+                  className="mt-2 bg-red-500 text-white py-1 px-3 rounded"
+                >
                   Remove Image
                 </button>
               </div>
             ) : (
-              <div className='flex flex-col items-center'>
-                <Image src="/assets/icons/upload.svg" alt="Upload" width={40} height={40} />
+              <div className="flex flex-col items-center">
+                <Image
+                  src="/assets/icons/upload.svg"
+                  alt="Upload"
+                  width={40}
+                  height={40}
+                />
                 <div className="file-upload_label">
-                  <br/>
+                  <br />
                   <p className="text-14-regular">
                     <span className="text-green-500">Click to upload </span>
                     or drag and drop
@@ -88,10 +111,18 @@ const CapturePopover: React.FC = () => {
                 ref={webcamRef}
                 className="rounded-lg transform scale-x--1"
               />
-              <button onClick={handleCaptureImage} className="bg-blue-500 text-white py-1 px-3 rounded">
+              <button
+                onClick={handleCaptureImage}
+                className="bg-blue-500 text-white py-1 px-3 rounded"
+              >
                 Capture Image
               </button>
-              <Input type="file" accept="image/*,.pdf" onChange={handleFileUpload} className="file-input mt-2" />
+              <Input
+                type="file"
+                accept="image/*,.pdf"
+                onChange={handleFileUpload}
+                className="file-input mt-2"
+              />
             </div>
           </PopoverContent>
         )}

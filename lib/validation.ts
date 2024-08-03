@@ -27,13 +27,13 @@ export const CustomerFormValidation = z.object({
   check_out: z.coerce.date(),
   nationality: z.string(),
   vehicle_no: z.string().optional(),
-  purpose: z.string(),  
+  purpose: z.string(),
   identificationType: z.string(),
   identificationNumber: z.string(),
   identificationDocument: z.custom<File[]>(),
   customer_image: z.custom<File[]>(),
   gender: z.enum(["Male", "Female", "Other"]),
-  signature: z.string().url("Incorrect URL"),
+  signature: z.string().url("Incorrect URL").optional(),
   address: z
     .string()
     .min(5, "Address must be at least 5 characters")
@@ -50,7 +50,7 @@ export const CustomerFormValidation = z.object({
     .string()
     .refine(
       (emergencyContactNumber) => /^\+\d{10,15}$/.test(emergencyContactNumber),
-      "Invalid phone number"
+      "Invalid phone number",
     ),
   primaryPhysician: z.string().min(2, "Select at least one doctor"),
   insuranceProvider: z
