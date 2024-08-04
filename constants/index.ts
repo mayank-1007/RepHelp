@@ -901,10 +901,10 @@ export const CustomerFormDefaultValues = {
 };
 
 export const Identificationtypes = [
-  "Driver's License",
-  "Passport",
-  "Voter ID Card",
-  "Adhar Card",
+  "driving_license",
+  "passport",
+  "voter_id",
+  "adhar",
 ];
 
 export const RoomNumber = [

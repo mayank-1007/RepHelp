@@ -142,7 +142,7 @@ const RenderField = ({ field, props }: { field: any; props: CustomProps }) => {
       // console.log(placeholder);
       // console.log(field.value);
       // console.log(children);
-      console.log(field);
+      // console.log(field);
       // console.log(props);
       return (
         <FormControl>

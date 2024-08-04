@@ -113,8 +113,9 @@ export default function RegisterForm({ user }: { user: User }) {
     setSelectedIdentificationType(event);
   };
 
-  const onSubmit = async (values: z.infer<typeof CustomerFormValidation>) => {
+    const onSubmit = async (values: z.infer<typeof CustomerFormValidation>) => {
     // const {name, email, phone, room_no} = props
+    alert("This is an alert message!");
     console.log("by");
     setIsLoading(true);
     let formData;
@@ -142,7 +143,7 @@ export default function RegisterForm({ user }: { user: User }) {
         values.identificationDocument[0].name,
       );
     }
-    try {
+    // try {
       const customerData = {
         ...values,
         userId: user.$id,
@@ -152,10 +153,10 @@ export default function RegisterForm({ user }: { user: User }) {
       };
       const customer = await registerCustomer(customerData);
       console.log(customerData);
-      router.push(`/admin`);
-    } catch (error) {
-      console.log(error);
-    }
+      router.push(`/customer/${user.$id}/new-booking`);
+    // } catch (error) {
+      // console.log(error);
+    // }
     setIsLoading(false);
   };
   return (
@@ -533,12 +534,13 @@ export default function RegisterForm({ user }: { user: User }) {
           />
         </section>
 
+        {/* <SubmitButton isLoading={isLoading} >Welcome</SubmitButton> */}
+        <Button type="submit">Welcome</Button>
         <Link
-          type="submit"
-          href={`/admin`}
-          onClick={form.handleSubmit(onSubmit)}
+          href={`/customer/${user.$id}/register`}
+          className="w-full rounded-md border border-border bg-secondary text-light-100"
         >
-          ikfikejnj
+          Skip Now
         </Link>
       </form>
     </Form>

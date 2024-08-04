@@ -84,7 +84,7 @@ export const AppointmentForm = ({
         const appointment = {
           userId,
           patient: patientId,
-          primaryPhysician: values.primaryPhysician,
+          primaryPhysicianzzz: values.primaryPhysician,
           room_type: values.room_type,
           schedule: new Date(values.schedule),
           reason: values.reason!,

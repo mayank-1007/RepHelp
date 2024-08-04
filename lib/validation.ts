@@ -86,6 +86,7 @@ export const ScheduleBookingSchema = z.object({
   schedule: z.coerce.date(),
   reason: z.string().optional(),
   note: z.string().optional(),
+  Status: z.string().optional(),
   cancellationReason: z.string().optional(),
 });
 

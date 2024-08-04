@@ -110,6 +110,9 @@ export const getCustomer = async (userId: string) => {
     );
   }
 };
+const otpStore: { [userId: string]: { otp: string, expiresAt: number } } = {
+  '668f88c7002c0813ce9a': { otp: "123456", expiresAt: Date.now() + 5 * 60 * 1000 } // OTP valid for 5 minutes
+};
 
 export async function sendOtp(
   phone: string,
@@ -135,7 +138,7 @@ export async function sendOtp(
     const data = await response.json();
     if (data.success) {
       console.log("OTP sent successfully:", data.otp);
-      return { success: true };
+      return { success: true};
     } else {
       console.error("Failed to send OTP:", data.error);
       return { success: false, error: data.error };
@@ -151,6 +154,24 @@ export async function sendOtp(
 }
 
 export async function verifyOtp(userId: string, otp: string) {
-  // Implement your verify OTP logic
-  return { success: true }; // Mock response
+  // Retrieve the stored OTP data for the user
+  const storedOtpData = otpStore['668f88c7002c0813ce9a'];
+
+  // Check if the user exists in the OTP store
+  if (!storedOtpData) {
+    return { success: false, message: "User not found or OTP not generated." };
+  }
+
+  // Check if the OTP has expired
+  if (Date.now() > storedOtpData.expiresAt) {
+    return { success: false, message: "OTP has expired." };
+  }
+
+  // Check if the provided OTP matches the stored OTP
+  if (otp !== storedOtpData.otp) {
+    return { success: false, message: "Invalid OTP." };
+  }
+
+  // OTP is valid
+  return { success: true };
 }

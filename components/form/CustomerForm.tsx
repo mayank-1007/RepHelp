@@ -83,6 +83,10 @@ export default function CustomerForm() {
       const verifyResponse = await verifyOtp(userId, otp);
       if (verifyResponse.success) {
         router.push(`/customer/${userId}/register`);
+        } else {
+          // Handle OTP verification error
+          // console.error("Failed to verify OTP", verifyResponse.error);
+          
       }
     } catch (error) {
       console.log(error);
@@ -128,27 +132,28 @@ export default function CustomerForm() {
       </form>
 
       <Dialog open={otpSent} onOpenChange={setOtpSent}>
-        <DialogTrigger asChild>
-          <Button variant="ghost" className="hidden">
-            Open
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogTitle>Enter OTP</DialogTitle>
-          <DialogDescription>
-            Please enter the OTP sent to your phone.
-          </DialogDescription>
-          <Input
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            placeholder="Enter OTP"
-            className="mb-4"
-          />
-          <DialogFooter>
-            <Button onClick={handleOtpSubmit}>Verify OTP</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+  <DialogTrigger asChild>
+    <Button variant="ghost" className="hidden">
+      Open
+    </Button>
+  </DialogTrigger>
+  <DialogContent className="bg-green-600"> {/* Add your background color class here */}
+    <DialogTitle>Enter OTP</DialogTitle>
+    <DialogDescription>
+      Please enter the OTP sent to your phone.
+    </DialogDescription>
+    <Input
+      value={otp}
+      onChange={(e) => setOtp(e.target.value)}
+      placeholder="Enter OTP"
+      className="mb-4"
+    />
+    <DialogFooter>
+      <Button onClick={handleOtpSubmit}>Verify OTP</Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
     </Form>
   );
 }

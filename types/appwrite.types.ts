@@ -22,7 +22,7 @@ export interface Appointment extends Models.Document {
   patient: Patient;
   schedule: Date;
   room_type: string;
-  status: Status;
+  status: Status | '';
   primaryPhysician: string;
   reason: string;
   note: string | "";

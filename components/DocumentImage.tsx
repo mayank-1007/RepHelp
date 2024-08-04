@@ -96,7 +96,7 @@ export const DocumentScanPopover: React.FC<DocumentScanPopoverProps> = ({
           },
         };
         const { data } = await Tesseract.recognize(image, "eng");
-        console.log("OCR result for image:", data.text);
+        // console.log("OCR result for image:", data.text);
         ocrIndexRef.current++;
         if (
           ocrIndexRef.current < capturedImages.length &&
@@ -160,7 +160,7 @@ export const DocumentScanPopover: React.FC<DocumentScanPopoverProps> = ({
             return parsedData;
           };
           const parsedData = processOCRResults(results, documentType);
-          console.log("Parsed OCR results:", parsedData);
+          // console.log("Parsed OCR results:", parsedData);
           onScanComplete(parsedData);
         }
       } catch (err) {
@@ -183,7 +183,7 @@ export const DocumentScanPopover: React.FC<DocumentScanPopoverProps> = ({
     return "";
   };
 
-  const extractIDNumberFromDrivingLicense = (results) => {
+  const extractIDNumberFromDrivingLicense = (results:any) => {
     const ocrText = results.join("\n"); // Join all OCR results into a single string
     const idNumberRegex = /\b\d{4} \d{4} \d{4}\b/; // Define the regex for three sets of four-digit numbers separated by spaces
     const match = ocrText.match(idNumberRegex);
