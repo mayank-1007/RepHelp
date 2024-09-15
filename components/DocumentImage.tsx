@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import {
   Popover,
   PopoverTrigger,
@@ -16,10 +16,15 @@ import {
 } from "@/components/ui/select";
 import { FormControl } from "./ui/form";
 import { Button } from "./ui/button";
-import Tesseract, { WorkerOptions } from "tesseract.js";
 
 interface DocumentScanPopoverProps {
   onScanComplete: (data: any) => void;
+}
+interface LicenseData {
+  name: string;
+  dateOfBirth: string;
+  identificationNo: string;
+  address: string;
 }
 
 export const DocumentScanPopover: React.FC<DocumentScanPopoverProps> = ({
@@ -31,8 +36,6 @@ export const DocumentScanPopover: React.FC<DocumentScanPopoverProps> = ({
   const [documentType, setDocumentType] = useState<string>("");
 
   const webcamRef = useRef<Webcam>(null);
-  const ocrIndexRef = useRef<number>(0);
-  const maxIterations = 1000; // Maximum number of OCR iterations
 
   const handleCaptureImage = useCallback(() => {
     if (webcamRef.current) {
@@ -61,152 +64,78 @@ export const DocumentScanPopover: React.FC<DocumentScanPopoverProps> = ({
       setShowPopover(false);
     }
   };
+  const removeHindi = (text: string): string =>{
+    return text.replace(/[^\x00-\x7F]/g, '');
+  }
+  
+
+function extractLicenseData(text: string): LicenseData | null {
+    // Regex patterns
+    const namePattern = /Name:\s*([A-Z\s]+)(?=\n)/;
+    const dobPattern = /Date of Birth:\s*(\d{2}-\d{2}-\d{4})/;
+    const idPattern = /\b([A-Z]{2}\d{2}\s*\d{11})\b/;
+    const addressPattern = /Address\s*([\w\s,]*\d{6})/;
+
+    // Extracting data
+    const nameMatch = text.match(namePattern);
+    const dobMatch = text.match(dobPattern);
+    const idMatch = text.match(idPattern);
+    const addressMatch = text.match(addressPattern);
+
+    return {
+        name: nameMatch?nameMatch[1].trim():"",
+        dateOfBirth: dobMatch?dobMatch[1]:"",
+        identificationNo: idMatch?idMatch[1].replace(/\s/g, ''):"",
+        address: addressMatch?addressMatch[1].trim():""
+    };
+    return null;
+}
 
   const handleRemoveImage = (index: number) => {
     setCapturedImages((prevImages) => prevImages.filter((_, i) => i !== index));
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
-  interface CustomWorkerOptions extends WorkerOptions {
-    tessedit_char_whitelist?: string;
-  }
 
   const handleOCR = useCallback(async () => {
     console.log("Starting OCR process");
-    const image = capturedImages[ocrIndexRef.current];
-    if (image) {
+  
+    for (let image of capturedImages) {
       try {
-        const customOptions: CustomWorkerOptions = {
-          tessedit_char_whitelist:
-            "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
-          corePath: "",
-          langPath: "",
-          cachePath: "",
-          dataPath: "",
-          workerPath: "",
-          cacheMethod: "",
-          workerBlobURL: false,
-          gzip: false,
-          legacyLang: false,
-          legacyCore: false,
-          logger: function (arg: Tesseract.LoggerMessage): void {
-            throw new Error("Function not implemented.");
+        // Convert base64 to Blob
+        const blob = await fetch(image).then((res) => res.blob());
+  
+        // Prepare the API request
+        const data = new FormData();
+        data.append('image', blob, 'image.jpg'); // Use 'image' as the field name
+  
+        const options = {
+          method: 'POST',
+          headers: {
+            'x-rapidapi-key': 'b6ebee2f7dmshb79e2f003a3ba8cp1d5edcjsn679c6ac1763f',
+            'x-rapidapi-host': 'ocr43.p.rapidapi.com'
           },
-          errorHandler: function (arg: any): void {
-            throw new Error("Function not implemented.");
-          },
+          body: data
         };
-        const { data } = await Tesseract.recognize(image, "eng");
-        // console.log("OCR result for image:", data.text);
-        ocrIndexRef.current++;
-        if (
-          ocrIndexRef.current < capturedImages.length &&
-          ocrIndexRef.current < maxIterations
-        ) {
-          setTimeout(handleOCR, 100); // Perform OCR every 100ms
-        } else {
-          ocrIndexRef.current = 0; // Reset index for future scans
-          const results = await Promise.all(
-            capturedImages.map(async (img) => {
-              const { data } = await Tesseract.recognize(img, "eng");
-              return data.text;
-            }),
-          );
-          const processOCRResults = (
-            results: string[],
-            documentType: string,
-          ) => {
-            let parsedData = {};
-            switch (documentType) {
-              case "driving_license":
-                parsedData = {
-                  name: extractNameFromDrivingLicense(results),
-                  idNumber: extractIDNumberFromDrivingLicense(results),
-                  dob: extractDOBFromDrivingLicense(results),
-                  address: extractAddressFromDrivingLicense(results),
-                  vehicleNumber: extractVehicleNumber(results),
-                };
-                break;
-              case "driving_license":
-                parsedData = {
-                  name: extractNameFromDrivingLicense(results),
-                  idNumber: extractIDNumberFromDrivingLicense(results),
-                  dob: extractDOBFromDrivingLicense(results),
-                  address: extractAddressFromDrivingLicense(results),
-                  vehicleNumber: extractVehicleNumber(results),
-                };
-                break;
-              case "passport":
-                parsedData = {
-                  name: extractNameFromDrivingLicense(results),
-                  idNumber: extractIDNumberFromDrivingLicense(results),
-                  dob: extractDOBFromDrivingLicense(results),
-                  address: extractAddressFromDrivingLicense(results),
-                  vehicleNumber: extractVehicleNumber(results),
-                };
-                break;
-              case "driving_license":
-                parsedData = {
-                  name: extractNameFromDrivingLicense(results),
-                  idNumber: extractIDNumberFromDrivingLicense(results),
-                  dob: extractDOBFromDrivingLicense(results),
-                  address: extractAddressFromDrivingLicense(results),
-                  vehicleNumber: extractVehicleNumber(results),
-                };
-                break;
-              // Add cases for other document types (passport, Aadhar card, etc.)
-              default:
-                break;
-            }
-            return parsedData;
-          };
-          const parsedData = processOCRResults(results, documentType);
-          // console.log("Parsed OCR results:", parsedData);
-          onScanComplete(parsedData);
+  
+        const response = await fetch('https://ocr43.p.rapidapi.com/v1/results', options);
+  
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Error response from OCR API:', errorText);
+          return;
         }
+  
+        const result = await response.json();
+  
+        console.log('OCR API response:', result);
+        console.log('Text :', extractLicenseData(removeHindi(result.results[0].entities[0].objects[0].entities[0].text)));
+        onScanComplete(result);
       } catch (err) {
         console.error("Error during OCR:", err);
       }
     }
-  }, [capturedImages, documentType, onScanComplete]);
-
-  useEffect(() => {
-    if (capturedImages.length > 0) {
-      handleOCR();
-    }
-  }, [capturedImages, handleOCR]);
-
-  const extractNameFromDrivingLicense = (results: string[]) => {
-    // const ocrText = results.join('\n'); // Join all OCR results into a single string
-    // const nameRegex = /Name:\s+([A-Za-z]{2,}(?:\s+[A-Za-z]{2,}){1,2})/;
-    // const match = ocrText.match(nameRegex);
-    // return match ? match[1].trim() : '';
-    return "";
-  };
-
-  const extractIDNumberFromDrivingLicense = (results:any) => {
-    const ocrText = results.join("\n"); // Join all OCR results into a single string
-    const idNumberRegex = /\b\d{4} \d{4} \d{4}\b/; // Define the regex for three sets of four-digit numbers separated by spaces
-    const match = ocrText.match(idNumberRegex);
-    return match ? match[0].trim() : "";
-  };
-
-  const extractDOBFromDrivingLicense = (results: string[]) => {
-    // const ocrText = results.join('\n'); // Join all OCR results into a single string
-    // const nameRegex = ;
-    // const match = ocrText.match(nameRegex);
-    // return match ? match[1].trim() : '';
-    return "";
-  };
-
-  const extractAddressFromDrivingLicense = (results: string[]) => {
-    // Implement based on the structure of your OCR result
-    return "";
-  };
-
-  const extractVehicleNumber = (results: string[]) => {
-    // Implement based on the structure of your OCR result
-    return "";
-  };
+  }, [capturedImages, onScanComplete]);
+  
 
   return (
     <div className="p-4">
@@ -226,7 +155,6 @@ export const DocumentScanPopover: React.FC<DocumentScanPopoverProps> = ({
               <SelectItem value="passport">Passport</SelectItem>
               <SelectItem value="voter_id">Voter ID Card</SelectItem>
               <SelectItem value="adhar">Adhaar Card</SelectItem>
-              {/* Add other document types as needed */}
             </SelectContent>
           </Select>
         </FormControl>
@@ -309,6 +237,7 @@ export const DocumentScanPopover: React.FC<DocumentScanPopoverProps> = ({
               >
                 Capture Image
               </Button>
+              ${`it's ight not to include 'File objects here`}
               <Input
                 type="file"
                 accept="image/*,.pdf"
@@ -319,6 +248,15 @@ export const DocumentScanPopover: React.FC<DocumentScanPopoverProps> = ({
           </PopoverContent>
         )}
       </Popover>
+      <div className="mt-4">
+        <Button
+          type="button"
+          onClick={handleOCR}
+          className="bg-green-500 text / text-white py-2 px-4 rounded"
+        >
+          Start OCR Scanning
+        </Button>
+      </div>
     </div>
   );
 };

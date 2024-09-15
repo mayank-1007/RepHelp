@@ -60,16 +60,17 @@ export default function CustomerForm() {
     setIsLoading(true);
     try {
       const user = await createUser(data);
+
       if (user) {
         setUserId(user.$id);
-        console.log(data.phone);
-        const otpResponse = await sendOtp(data.phone);
-        // if (otpResponse.success) {
+
+        const otpResponse = await sendOtp(data.phone, user.$id, data.email,data.name);
+
+        if (otpResponse.success) {
           setOtpSent(true);
-        // } else {
-          // Handle OTP sending error
-          // console.error("Failed to send OTP", otpResponse.error);
-        // }
+        } else {
+          console.error("Failed to send OTP");
+        }
       }
     } catch (error) {
       console.log(error);
@@ -83,10 +84,8 @@ export default function CustomerForm() {
       const verifyResponse = await verifyOtp(userId, otp);
       if (verifyResponse.success) {
         router.push(`/customer/${userId}/register`);
-        } else {
-          // Handle OTP verification error
-          // console.error("Failed to verify OTP", verifyResponse.error);
-          
+      } else {
+        console.error("Failed to verify OTP", verifyResponse.error);
       }
     } catch (error) {
       console.log(error);

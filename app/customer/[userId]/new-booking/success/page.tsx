@@ -13,9 +13,9 @@ const RequestSuccess = async ({
   const appointmentId = (searchParams?.appointmentId as string) || "";
   const appointment = await getAppointment(appointmentId);
 
-  const doctor = Doctors.find(
-    (doctor) => doctor.name === appointment.primaryPhysician,
-  );
+  // const doctor = Doctors.find(
+  //   (doctor) => doctor.name === appointment.primaryPhysician,
+  // );
 
   return (
     <div className=" flex h-screen max-h-screen px-[5%]">
@@ -59,7 +59,7 @@ const RequestSuccess = async ({
               height={100}
               className="size-6"
             />
-            <p className="whitespace-nowrap">Room No. : 45</p>
+            <p className="whitespace-nowrap">Room Type : {appointment.room_type}</p>
           </div>
           <div className="flex gap-2">
             <Image
@@ -68,7 +68,7 @@ const RequestSuccess = async ({
               width={24}
               alt="calendar"
             />
-            <p> {appointment.schedule?formatDateTime(appointment.schedule).dateTime : (new Date()).toISOString().split('T')[0]}</p>
+            <p> Checkout DateTime : {appointment.schedule?formatDateTime(appointment.schedule).dateTime : (new Date()).toISOString().split('T')[0]}</p>
           </div>
         </section>
 

@@ -24,9 +24,6 @@ import { Select, SelectContent, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
 import { Checkbox } from "./ui/checkbox";
 
-const getCurrentDate = (): Date => {
-  return new Date();
-};
 
 interface CustomProps {
   control: Control<any>;
@@ -139,11 +136,6 @@ const RenderField = ({ field, props }: { field: any; props: CustomProps }) => {
         </FormControl>
       );
     case FormFieldType.SELECT:
-      // console.log(placeholder);
-      // console.log(field.value);
-      // console.log(children);
-      // console.log(field);
-      // console.log(props);
       return (
         <FormControl>
           <Select value={value} onValueChange={field.onChange}>
@@ -173,37 +165,14 @@ const RenderField = ({ field, props }: { field: any; props: CustomProps }) => {
       );
     case FormFieldType.SKELETON:
       return renderSkeleton ? renderSkeleton(field) : null;
-    // case FormFieldType.DROPDOWN:
-    //     return(
-    //         <div>
-    //         <FormControl>
-    //           <Label htmlFor={name}>{label}</Label>
-    //           <Select
-    //             id={name}
-    //             name={name}
-    //             placeholder={placeholder}
-    //             onValueChange={control.onChange}
-    //             defaultValue={control.value}
-    //           >
-    //             {GenderOptions.map((option) => (
-    //               <SelectItem key={option} value={option}>
-    //                 {option}
-    //               </SelectItem>
-    //             ))}
-    //           </Select>
-    //         </FormControl>
-    //         </div>
-    //     )
-
     default:
       break;
   }
-  console.log(placeholder);
 };
 
 const CustomFormField = (props: CustomProps) => {
-  const { control, fieldType, name, label, placeholder, room_no, value } =
-    props;
+  const { control, fieldType, name, label, placeholder, value } =  props;
+
   return (
     <FormField
       control={control}

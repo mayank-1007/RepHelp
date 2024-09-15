@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, ChangeEvent } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -25,7 +26,6 @@ import { RadioGroup } from "../ui/radio-group";
 import { CustomerFormDefaultValues, GenderOptions } from "@/constants";
 import {
   RoomNumber,
-  Doctors,
   Identificationtypes,
   countries,
   PurposeOptions,
@@ -38,19 +38,6 @@ import { RadioGroupItem } from "../ui/radio-group";
 import CountrySelect from "../Nationality";
 import NestedDropdown from "../StateDistrict";
 import SignaturePad from "../SignaturePad";
-import Test from "../OrScan";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import Dropdown from "react-dropdown";
 import { Option } from "lucide-react";
@@ -60,18 +47,18 @@ import { SelectItem } from "@radix-ui/react-select";
 import CapturePopover from "../CustomerImage";
 import { DocumentScanPopover } from "../DocumentImage";
 import Link from "next/link";
-// import { toast } from "@/components/ui/use-toast"
+import DocumentTypeSelector from "../DocumentImageScan";
 
 const getCurrentDate = (): Date => {
   return new Date();
 };
 
 export default function RegisterForm({ user }: { user: User }) {
-  const [selectedIdentificationType, setSelectedIdentificationType] =
-    useState("");
+  const [selectedIdentificationType, setSelectedIdentificationType] = useState("");
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  // 1. Define your form.
+
+  
   const form = useForm<z.infer<typeof CustomerFormValidation>>({
     resolver: zodResolver(CustomerFormValidation),
     defaultValues: {
@@ -108,57 +95,48 @@ export default function RegisterForm({ user }: { user: User }) {
 
     // You can perform additional actions here, such as sending the dataURL to a server or storing it in state
   };
+
+
   const [abc, setAbc] = useState("");
+
+
   const handleIdentificationTypeChange = (event: string) => {
     setSelectedIdentificationType(event);
   };
 
-    const onSubmit = async (values: z.infer<typeof CustomerFormValidation>) => {
-    // const {name, email, phone, room_no} = props
-    alert("This is an alert message!");
-    console.log("by");
-    setIsLoading(true);
-    let formData;
-    if (values.customer_image && values.customer_image.length > 0) {
-      const blobFile = new Blob([values.customer_image[0]], {
-        type: values.customer_image[0].type,
-      });
-      formData = new FormData();
-      formData.append("blobFile", blobFile);
-      formData.append("fileName", values.customer_image[0].name);
-    }
 
-    let customerformData;
-    if (
-      values.identificationDocument &&
-      values.identificationDocument.length > 0
-    ) {
-      const blobFile = new Blob([values.identificationDocument[0]], {
-        type: values.identificationDocument[0].type,
-      });
-      customerformData = new FormData();
-      customerformData.append("blobFile", blobFile);
-      customerformData.append(
-        "fileName",
-        values.identificationDocument[0].name,
-      );
-    }
-    // try {
+
+  const onSubmit = async (values: z.infer<typeof CustomerFormValidation>) => {
+    console.log("Form submission started");
+    setIsLoading(true);
+  
+    try {
       const customerData = {
         ...values,
         userId: user.$id,
-        birthDate: new Date(values.birthDate),
-        customer_image: formData,
-        identificationDocument: customerformData,
+        birthDate: new Date(values.birthDate ? values.birthDate : getCurrentDate()),
       };
+      
+      // Debugging statements
+      console.log("Customer Data:", customerData);
+      
       const customer = await registerCustomer(customerData);
-      console.log(customerData);
+      
+      console.log("Customer registered successfully:", customer);
+      
+      // Ensure router push is reached
+      console.log("Navigating to the new booking route");
       router.push(`/customer/${user.$id}/new-booking`);
-    // } catch (error) {
-      // console.log(error);
-    // }
-    setIsLoading(false);
+      
+    } catch (error) {
+      console.log("An error occurred during form submission:", error);
+    } finally {
+      // Ensure loading is disabled regardless of success or error
+      setIsLoading(false);
+    }
   };
+
+
   return (
     <Form {...form}>
       <form
@@ -239,21 +217,7 @@ export default function RegisterForm({ user }: { user: User }) {
             )}
           />
         </div>
-        {/* <CustomFormField
-            fieldType={FormFieldType.SELECT}
-            control={form.control}
-            name="roomNumber"
-            label="Room Number"
-            placeholder={RoomNumber[0]}
-          >
-            {RoomNumber.map((room, i) => (
-              <SelectItem key={room + i} value={room}>
-                <div className="flex cursor-pointer items-center gap-2">
-                  <p>{room}</p>
-                </div>
-              </SelectItem>
-            ))}
-          </CustomFormField> */}
+
         <div className="flex flex-col gap-6 xl:flex-row">
           <CustomFormField
             fieldType={FormFieldType.TEXTAREA}
@@ -309,6 +273,7 @@ export default function RegisterForm({ user }: { user: User }) {
               </SelectItem>
             ))}
           </CustomFormField>
+
           <CustomFormField
             fieldType={FormFieldType.SELECT}
             control={form.control}
@@ -344,17 +309,7 @@ export default function RegisterForm({ user }: { user: User }) {
           />
         </div>
         <div className="flex flex-col gap-6 xl:flex-row">
-          {/* <CustomFormField
-            fieldType={FormFieldType.SKELETON}
-            control={form.control}
-            name="nationality"
-            label="Nationality"
-            renderSkeleton={(field) => (
-              <FormControl>
-                <CountrySelect />
-              </FormControl>
-            )}
-          /> */}
+
           <CustomFormField
             fieldType={FormFieldType.SELECT}
             control={form.control}
@@ -472,6 +427,7 @@ export default function RegisterForm({ user }: { user: User }) {
               </FormControl>
             )}
           />
+
           <CustomFormField
             fieldType={FormFieldType.SKELETON}
             control={form.control}
@@ -483,17 +439,7 @@ export default function RegisterForm({ user }: { user: User }) {
               </FormControl>
             )}
           />
-          {/* <CustomFormField
-            fieldType={FormFieldType.SKELETON}
-            control={form.control}
-            name="customer_image"
-            label="Customer Image"
-            renderSkeleton={(field) => (
-              <FormControl> */}
-          {/* <Test /> */}
-          {/* </FormControl>
-            )}
-          /> */}
+
           <CustomFormField
             fieldType={FormFieldType.SKELETON}
             control={form.control}
@@ -534,15 +480,10 @@ export default function RegisterForm({ user }: { user: User }) {
           />
         </section>
 
-        {/* <SubmitButton isLoading={isLoading} >Welcome</SubmitButton> */}
-        <Button type="submit">Welcome</Button>
-        <Link
-          href={`/customer/${user.$id}/register`}
-          className="w-full rounded-md border border-border bg-secondary text-light-100"
-        >
-          Skip Now
-        </Link>
+        <SubmitButton isLoading={isLoading} >Welcome</SubmitButton>
+       
       </form>
     </Form>
   );
 }
+

@@ -43,25 +43,25 @@ const AdminPage = async () => {
         <section className="admin-stat">
           <StatCard
             type="appointments"
-            count={appointments.scheduledCount}
-            label="Scheduled appointments"
+            count={appointments.total || 0}
+            label="Scheduled Booking"
             icon={"/assets/icons/appointments.svg"}
           />
           <StatCard
             type="pending"
-            count={appointments.pendingCount}
-            label="Pending appointments"
+            count={appointments.pendingCount || 0}
+            label="Pending Booking"
             icon={"/assets/icons/pending.svg"}
           />
           <StatCard
             type="cancelled"
-            count={appointments.cancelledCount}
-            label="Cancelled appointments"
+            count={appointments.cancelledCount || 0}
+            label="Cancelled Booking"
             icon={"/assets/icons/cancelled.svg"}
           />
         </section>
 
-        <DataTable columns={columns} data={appointments.documents} />
+        <DataTable columns={columns || []} data={appointments.documents || ""} />
       </main>
     </div>
   );
