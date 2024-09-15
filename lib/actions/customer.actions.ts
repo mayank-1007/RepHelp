@@ -81,11 +81,17 @@ export const registerCustomer = async ({
     }
 
     if (existingCustomer) {
+      const userId = UserBindingInstance; // or however you access the document ID
+
+// Ensure userId is a string
+    if (typeof userId !== 'string') {
+      throw new Error('UserBindingInstance does not have a valid ID.');
+    }
       // Update the existing document
       const updatedCustomer = await databases.updateDocument(
         DATABASE_ID!,
         CUSTOMER_COLLECTION_ID!,
-        UserBindingInstance,
+        userId,
         {
           ...customer,
         }
