@@ -40,6 +40,13 @@ export default function Home({ searchParams }: SearchParamProps) {
         alt="customer"
         className="side-img max-w-[50%] rounded-l-3xl"
       />
+      <Image
+        src="/assets/images/onboarding.webp"
+        height={1000}
+        width={1000}
+        alt="customer"
+        className="side-img max-w-[50%] rounded-l-3xl"
+      />
     </div>
   );
 }
