@@ -18,6 +18,12 @@ export const createAppointment = async (
   appointment: CreateAppointmentParams,
 ) => {
   try {
+    // Check if required environment variables are present
+    if (!DATABASE_ID || !BOOKING_COLLECTION_ID) {
+      console.error("Missing required environment variables: DATABASE_ID or BOOKING_COLLECTION_ID");
+      throw new Error("Database configuration is missing");
+    }
+
     const newAppointment = await databases.createDocument(
       DATABASE_ID!,
       BOOKING_COLLECTION_ID!,
@@ -29,12 +35,25 @@ export const createAppointment = async (
     return parseStringify(newAppointment);
   } catch (error) {
     console.error("An error occurred while creating a new appointment:", error);
+    throw error;
   }
 };
 
 //  GET RECENT APPOINTMENTS
 export const getRecentAppointmentList = async () => {
   try {
+    // Check if required environment variables are present
+    if (!DATABASE_ID || !BOOKING_COLLECTION_ID) {
+      console.error("Missing required environment variables: DATABASE_ID or BOOKING_COLLECTION_ID");
+      return {
+        totalCount: 0,
+        scheduledCount: 0,
+        pendingCount: 0,
+        cancelledCount: 0,
+        documents: [],
+      };
+    }
+
     const appointments = await databases.listDocuments(
       DATABASE_ID!,
       BOOKING_COLLECTION_ID!,
@@ -91,12 +110,19 @@ export const getRecentAppointmentList = async () => {
       documents: appointments.documents,
     };
 
-    return parseStringify(data);
-  } catch (error) {
+    return parseStringify(data);  } catch (error) {
     console.error(
       "An error occurred while retrieving the recent appointments:",
       error,
     );
+    // Return default structure on error to prevent build failures
+    return {
+      totalCount: 0,
+      scheduledCount: 0,
+      pendingCount: 0,
+      cancelledCount: 0,
+      documents: [],
+    };
   }
 };
 
@@ -124,6 +150,12 @@ export const updateAppointment = async ({
   type,
 }: UpdateAppointmentParams) => {
   try {
+    // Check if required environment variables are present
+    if (!DATABASE_ID || !BOOKING_COLLECTION_ID) {
+      console.error("Missing required environment variables: DATABASE_ID or BOOKING_COLLECTION_ID");
+      throw new Error("Database configuration is missing");
+    }
+
     // Update appointment to scheduled -> https://appwrite.io/docs/references/cloud/server-nodejs/databases#updateDocument
     const updatedAppointment = await databases.updateDocument(
       DATABASE_ID!,
@@ -141,12 +173,19 @@ export const updateAppointment = async ({
     return parseStringify(updatedAppointment);
   } catch (error) {
     console.error("An error occurred while scheduling an appointment:", error);
+    throw error;
   }
 };
 
 // GET APPOINTMENT
 export const getAppointment = async (appointmentId: string) => {
   try {
+    // Check if required environment variables are present
+    if (!DATABASE_ID || !BOOKING_COLLECTION_ID) {
+      console.error("Missing required environment variables: DATABASE_ID or BOOKING_COLLECTION_ID");
+      return null;
+    }
+
     const appointment = await databases.getDocument(
       DATABASE_ID!,
       BOOKING_COLLECTION_ID!,
@@ -159,5 +198,6 @@ export const getAppointment = async (appointmentId: string) => {
       "An error occurred while retrieving the existing patient:",
       error,
     );
+    return null;
   }
 };

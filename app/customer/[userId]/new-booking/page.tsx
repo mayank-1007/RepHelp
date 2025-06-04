@@ -4,6 +4,9 @@ import { AppointmentForm } from "@/components/form/AppointmentForm";
 import { getCustomer } from "@/lib/actions/customer.actions";
 import Link from "next/link";
 
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic';
+
 const Appointment = async ({ params: { userId } }: SearchParamProps) => {
   const patient = await getCustomer(userId);
 

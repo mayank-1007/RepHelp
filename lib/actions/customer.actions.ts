@@ -61,6 +61,12 @@ export const registerCustomer = async ({
   ...customer // This will capture all other properties from RegisterUserParams
 }: RegisterUserParams) => {
   try {
+    // Check if required environment variables are present
+    if (!DATABASE_ID || !CUSTOMERDETAIL_COLLECTION_ID) {
+      console.error("Missing required environment variables: DATABASE_ID or CUSTOMERDETAIL_COLLECTION_ID");
+      throw new Error("Database configuration is missing");
+    }
+
     // Check if the document exists
     let existingCustomer;
     if (userId) {
@@ -130,6 +136,12 @@ export const registerCustomer = async ({
 
 export const getCustomer = async (userId: string) => {
   try {
+    // Check if required environment variables are present
+    if (!DATABASE_ID || !CUSTOMER_COLLECTION_ID) {
+      console.error("Missing required environment variables: DATABASE_ID or CUSTOMER_COLLECTION_ID");
+      return null;
+    }
+
     const customers = await databases.listDocuments(
       DATABASE_ID!,
       CUSTOMER_COLLECTION_ID!,
@@ -142,6 +154,7 @@ export const getCustomer = async (userId: string) => {
       "An error occurred while retrieving the patient details:",
       error,
     );
+    return null;
   }
 };
 const otpStore: { [userId: string]: { otp: string, expiresAt: number } } = {
@@ -150,13 +163,19 @@ const otpStore: { [userId: string]: { otp: string, expiresAt: number } } = {
 
 export async function sendOtp(phone: string, userId: string, email: string, name: string) {
   try {
+    // Check if required environment variables are present
+    if (!DATABASE_ID || !CUSTOMER_COLLECTION_ID) {
+      console.error("Missing required environment variables: DATABASE_ID or CUSTOMER_COLLECTION_ID");
+      return { success: false, error: "Database configuration is missing" };
+    }
+
     // Generate a 4-digit OTP
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
     // Check if a document with the given userId already exists
     const existingDocuments = await databases.listDocuments(
-      process.env.DATABASE_ID || "",          // Ensure DATABASE_ID is provided
-      process.env.CUSTOMER_COLLECTION_ID || "", // Ensure CUSTOMER_COLLECTION_ID is provided
+      DATABASE_ID!,
+      CUSTOMER_COLLECTION_ID!,
       [/* filters if needed */], // Adjust if you need to filter based on specific fields
     );
 
@@ -165,8 +184,8 @@ export async function sendOtp(phone: string, userId: string, email: string, name
     if (existingDocument) {
       // If document exists, update it with the new OTP (if needed)
       await databases.updateDocument(
-        process.env.DATABASE_ID || "",
-        process.env.CUSTOMER_COLLECTION_ID || "",
+        DATABASE_ID!,
+        CUSTOMER_COLLECTION_ID!,
         existingDocument.$id, // ID of the existing document
         { 
           name : name,
@@ -178,8 +197,8 @@ export async function sendOtp(phone: string, userId: string, email: string, name
     } else {
       // Create a new document with the OTP
       await databases.createDocument(
-        process.env.DATABASE_ID || "",
-        process.env.CUSTOMER_COLLECTION_ID || "",
+        DATABASE_ID!,
+        CUSTOMER_COLLECTION_ID!,
         userId, // This should be a unique ID, or you can use another unique field
         { 
           userId: userId,
@@ -216,10 +235,16 @@ export async function sendOtp(phone: string, userId: string, email: string, name
 
 export async function verifyOtp(userId: string, enteredOtp: string) {
   try {
+    // Check if required environment variables are present
+    if (!DATABASE_ID || !CUSTOMER_COLLECTION_ID) {
+      console.error("Missing required environment variables: DATABASE_ID or CUSTOMER_COLLECTION_ID");
+      return { success: false, error: "Database configuration is missing" };
+    }
+
     // Fetch the document from the database
     const document = await databases.getDocument(
-      process.env.DATABASE_ID || "",
-      process.env.CUSTOMER_COLLECTION_ID || "",
+      DATABASE_ID!,
+      CUSTOMER_COLLECTION_ID!,
       userId
     );
 
@@ -227,8 +252,8 @@ export async function verifyOtp(userId: string, enteredOtp: string) {
     if (document.otp === enteredOtp) {
       // OTP is correct, update the document
       await databases.updateDocument(
-        process.env.DATABASE_ID || "",
-        process.env.CUSTOMER_COLLECTION_ID || "",
+        DATABASE_ID!,
+        CUSTOMER_COLLECTION_ID!,
         userId,
         { otpVerified: true } // Ensure otpVerified field exists in your schema
       );

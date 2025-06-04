@@ -5,13 +5,13 @@ const appwriteClient = new Client();
 const databases = new Databases(appwriteClient);
 
 appwriteClient
-  .setEndpoint(process.env.APPWRITE_ENDPOINT!)
-  .setProject(process.env.APPWRITE_PROJECT_ID!);
+  .setEndpoint(process.env.NEXT_PUBLIC_ENDPOINT!)
+  .setProject(process.env.PROJECT_ID!);
 
 const verifyOtp = async (phone: string, otp: string) => {
   const otpDocs = await databases.listDocuments(
-    process.env.APPWRITE_DATABASE_ID!,
-    process.env.APPWRITE_COLLECTION_ID!,
+    process.env.DATABASE_ID!,
+    process.env.CUSTOMER_COLLECTION_ID!,
     [Query.equal("phone", phone), Query.equal("otp", otp)],
   );
 
@@ -26,8 +26,8 @@ const verifyOtp = async (phone: string, otp: string) => {
   }
 
   await databases.deleteDocument(
-    process.env.APPWRITE_DATABASE_ID!,
-    process.env.APPWRITE_COLLECTION_ID!,
+    process.env.DATABASE_ID!,
+    process.env.CUSTOMER_COLLECTION_ID!,
     otpDoc.$id,
   );
 
