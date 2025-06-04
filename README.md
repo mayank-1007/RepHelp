@@ -127,5 +127,3 @@ Contributions are welcome! Please follow standard fork-and-pull-request workflow
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details (if you add one).
 
 ---
-
-*This README was generated with assistance from GitHub Copilot.*
