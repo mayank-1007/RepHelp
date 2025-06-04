@@ -14,7 +14,7 @@ import {
 import { parseStringify } from "../utils";
 import { InputFile } from "node-appwrite/file";
 import { sendEmail } from "@/lib/email";
-import { UserBindingInstance } from "twilio/lib/rest/ipMessaging/v2/service/user/userBinding";
+// import { UserBindingInstance } from "twilio/lib/rest/ipMessaging/v2/service/user/userBinding";
 
 export const createUser = async (user: CreateUserParams) => {
   try {
@@ -58,7 +58,7 @@ export const getUser = async (userId: string) => {
 
 export const registerCustomer = async ({
   userId, // Assuming `id` is part of RegisterUserParams and used to identify the document
-  ...customer
+  ...customer // This will capture all other properties from RegisterUserParams
 }: RegisterUserParams) => {
   try {
     // Check if the document exists
@@ -70,9 +70,8 @@ export const registerCustomer = async ({
           CUSTOMERDETAIL_COLLECTION_ID!,
           userId
         );
-      } catch (error) {
-        // If the document does not exist, we can ignore the error
-        if (error) {
+      } catch (error: any) {
+        if (error.code === 404) { // Appwrite specific error code for 'Document not found'
           existingCustomer = null;
         } else {
           throw error;
@@ -80,37 +79,51 @@ export const registerCustomer = async ({
       }
     }
 
-    if (existingCustomer) {
-      const userId = UserBindingInstance; // or however you access the document ID
+    // Prepare all customer data directly from the customer object passed in
+    const customerDataToSave = {
+      ...customer, // Spread all properties from the customer object
+      userId: userId, // Ensure userId is part of the data to save
+      // Convert date strings to Date objects if necessary, Appwrite typically handles ISO strings
+      birthDate: customer.birthDate ? new Date(customer.birthDate) : undefined,
+      check_in: customer.check_in ? new Date(customer.check_in) : undefined,
+      check_out: customer.check_out ? new Date(customer.check_out) : undefined,
+      // Ensure fileds like identificationDocument and customer_image are handled correctly
+      // If they are file uploads, their IDs/URLs from storage should be used here.
+      // If they are already string URLs or base64, they can be passed directly.
+      // Example: identificationDocument: customer.identificationDocument, (if it's already a URL/ID)
+    };
 
-// Ensure userId is a string
-    if (typeof userId !== 'string') {
-      throw new Error('UserBindingInstance does not have a valid ID.');
-    }
+    if (existingCustomer) {
+      if (typeof userId !== 'string') {
+        throw new Error('User ID is invalid.');
+      }
       // Update the existing document
       const updatedCustomer = await databases.updateDocument(
         DATABASE_ID!,
-        CUSTOMER_COLLECTION_ID!,
-        userId,
-        {
-          ...customer,
-        }
+        CUSTOMERDETAIL_COLLECTION_ID!,
+        userId, // Use the userId which should be the document ID for this collection if designed that way
+        customerDataToSave
       );
       return parseStringify(updatedCustomer);
     } else {
       // Create a new document
+      // If userId is meant to be the document ID, it should be unique.
+      // If Appwrite is to generate a unique ID, use ID.unique() and store userId as a field.
       const newCustomer = await databases.createDocument(
         DATABASE_ID!,
         CUSTOMERDETAIL_COLLECTION_ID!,
-        ID.unique(),
-        {
-          ...customer,
-        }
+        userId || ID.unique(), // Use userId if provided and it's intended as document ID, else generate unique ID
+        customerDataToSave
       );
       return parseStringify(newCustomer);
     }
   } catch (error) {
-    console.log("An error occurred while registering a customer:", error);
+    console.error("An error occurred while registering a customer:", error);
+    // It's good practice to throw the error or return an error object
+    // to be handled by the caller function in the component.
+    // For example: return { error: error.message };
+    // For now, re-throwing to see the error in logs or handle it upstream.
+    throw error;
   }
 };
 

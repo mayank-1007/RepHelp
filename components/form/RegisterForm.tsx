@@ -107,31 +107,60 @@ export default function RegisterForm({ user }: { user: User }) {
 
 
   const onSubmit = async (values: z.infer<typeof CustomerFormValidation>) => {
-    console.log("Form submission started");
+    console.log("Form submission started with values:", values);
     setIsLoading(true);
   
     try {
-      const customerData = {
-        ...values,
-        userId: user.$id,
-        birthDate: new Date(values.birthDate ? values.birthDate : getCurrentDate()),
+      // Ensure all values from the form are correctly passed to customerData
+      const customerData: RegisterUserParams = {
+        userId: user.$id, // This should be the Appwrite User ID from auth
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        birthDate: values.birthDate ? new Date(values.birthDate) : undefined,
+        gender: values.gender,
+        address: values.address,
+        occupation: values.occupation,
+        emergencyContactName: values.emergencyContactName,
+        emergencyContactNumber: values.emergencyContactNumber,
+        identificationType: values.identificationType,
+        identificationNumber: values.identificationNumber,
+        // Assuming identificationDocument and customer_image are File objects or undefined
+        // These need to be uploaded to Appwrite storage first, then their IDs/URLs stored.
+        // For now, this example assumes they are handled by direct data or placeholder.
+        // You'll need to implement file uploading logic if these are actual files.
+        identificationDocument: values.identificationDocument?.[0] as any, // Placeholder for file handling
+        customer_image: values.customer_image?.[0] as any, // Placeholder for file handling
+        privacyConsent: values.privacyConsent,
+        number_of_rooms: values.number_of_rooms,
+        check_in: values.check_in ? new Date(values.check_in) : undefined,
+        check_out: values.check_out ? new Date(values.check_out) : undefined,
+        nationality: values.nationality,
+        vehicle_no: values.vehicle_no,
+        purpose: values.purpose,
+        // Ensure all other relevant fields from your form are included here
+        // For example, if you have 'coming_from', 'going_to', 'signature' fields in your form:
+        // coming_from: values.coming_from,
+        // going_to: values.going_to,
+        // signature: values.signature, // if it's a data URL or similar
       };
       
-      // Debugging statements
-      console.log("Customer Data:", customerData);
+      console.log("Customer Data to be sent to registerCustomer:", customerData);
       
       const customer = await registerCustomer(customerData);
       
-      console.log("Customer registered successfully:", customer);
-      
-      // Ensure router push is reached
-      console.log("Navigating to the new booking route");
-      router.push(`/customer/${user.$id}/new-booking`);
+      if (customer && !customer.error) {
+        console.log("Customer registered successfully:", customer);
+        router.push(`/customer/${user.$id}/new-booking`);
+      } else {
+        console.error("Failed to register customer:", customer?.error);
+        // Handle error display to the user, e.g., setError state
+      }
       
     } catch (error) {
-      console.log("An error occurred during form submission:", error);
+      console.error("An error occurred during form submission:", error);
+      // Handle error display to the user
     } finally {
-      // Ensure loading is disabled regardless of success or error
       setIsLoading(false);
     }
   };

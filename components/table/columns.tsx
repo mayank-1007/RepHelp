@@ -12,9 +12,12 @@ import { StatusBadge } from "../StatusBadge";
 
 export const columns: ColumnDef<Appointment>[] = [
   {
-    header: "#",
+    header: "Tracking ID", // Changed from "#"
     cell: ({ row }) => {
-      return <p className="text-14-medium ">{row.index + 1}</p>;
+      // Display the Appwrite document ID (tracking number)
+      // Optionally, you might want to display a shortened version if $id is too long
+      // For example: row.original.$id.substring(0, 8) + "..."
+      return <p className="text-14-medium ">{row.original.$id}</p>;
     },
   },
   {

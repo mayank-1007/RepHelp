@@ -21,6 +21,8 @@ export const AppointmentModal = ({
   userId,
   appointment,
   type,
+  title,
+  description,
 }: {
   userId: string;
   appointment?: Appointment;
@@ -42,14 +44,15 @@ export const AppointmentModal = ({
       </DialogTrigger>
       <DialogContent className="shad-dialog sm:max-w-md">
         <DialogHeader className="mb-4 space-y-3">
-          <DialogTitle className="capitalize">{type} Appointment</DialogTitle>
-          <DialogDescription>
-            Please fill in the following details to {type} appointment
-          </DialogDescription>
+          <DialogTitle className="capitalize">{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
         <AppointmentForm
           userId={userId}
+          type={type}
+          appointment={appointment}
+          setOpen={setOpen}
         />
       </DialogContent>
     </Dialog>

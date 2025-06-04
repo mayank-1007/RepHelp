@@ -26,6 +26,7 @@ const Appointment = async ({ params: { userId } }: SearchParamProps) => {
 
           <AppointmentForm
             userId={userId}
+            type="create"
           />
 
           <p className="copyright mt-10 py-12">© 2024 Rephelp</p>
