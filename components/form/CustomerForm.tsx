@@ -11,9 +11,23 @@ import CustomFormField from "@/components/CustomFormField";
 import SubmitButton from "@/components/SubmitButton";
 import { Input } from "@/components/ui/input";
 // import { UserFormValidation } from "@/lib/validation";
-import { useState } from "react";
-import { useRouter } from "next/navigation"; // Updated import for Next.js App Router
+import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation"; // Updated import for Next.js App Router
 import { createUser, sendOtp, verifyOtp } from "@/lib/actions/customer.actions";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import {
   Dialog,
   DialogTrigger,
@@ -22,6 +36,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { decryptKey, encryptKey } from "@/lib/utils";
+import Image from "next/image";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -43,10 +59,45 @@ const UserFormValidation = z.object({
 export default function CustomerForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const path = usePathname();
   const [otpSent, setOtpSent] = useState(false);
+  const [open, setOpen] = useState(false);
   const [otp, setOtp] = useState("");
   const [userId, setUserId] = useState("");
   const [isTestUserOpen, setIsTestUserOpen] = useState(false);
+  const [passkey, setPasskey] = useState("");
+  const [error, setError] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
+  const [showToast, setShowToast] = useState(false);
+
+  // Copy to clipboard function with toast
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setToastMessage(`${label} copied!`);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000); // Hide toast after 2 seconds
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  };
+
+  // Auto-hide toast effect
+  useEffect(() => {
+    if (showToast) {
+      const timer = setTimeout(() => setShowToast(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [showToast]);
+
+
+  
+  
+    const closeModal = () => {
+      setOpen(false);
+      router.push("/");
+    };
+  
 
   const form = useForm({
     resolver: zodResolver(UserFormValidation),
@@ -101,7 +152,20 @@ export default function CustomerForm() {
   }
 
   return (
-    <Form {...form}>
+    <>
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            {toastMessage}
+          </div>
+        </div>
+      )}
+
+      <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 flex-1">
         {/* Test User Button and Details Section */}
         <div className="absolute top-4 left-4 z-50">
@@ -145,21 +209,42 @@ export default function CustomerForm() {
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center justify-between gap-3">
                     <span className="font-medium text-gray-600">Name:</span>
-                    <span className="text-gray-800 select-all bg-gray-50 px-2 py-1 rounded ">Test User</span>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard("Test User", "Credential")}
+                      className="text-gray-800 select-all bg-gray-50 hover:bg-blue-50 px-2 py-1 rounded cursor-pointer transition-colors duration-200 border border-transparent hover:border-blue-200"
+                      title="Click to copy"
+                    >
+                      Test User
+                    </button>
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <span className="font-medium text-gray-600">Email:</span>
-                    <span className="text-gray-800 select-all bg-gray-50 px-2 py-1 rounded text-xs">test@test.com</span>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard("test@test.com", "Credential")}
+                      className="text-gray-800 select-all bg-gray-50 hover:bg-blue-50 px-2 py-1 rounded text-xs cursor-pointer transition-colors duration-200 border border-transparent hover:border-blue-200"
+                      title="Click to copy"
+                    >
+                      test@test.com
+                    </button>
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <span className="font-medium text-gray-600">Phone:</span>
-                    <span className="text-gray-800 select-all bg-gray-50 px-2 py-1 rounded text-xs">+918888888888</span>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard("8888888888", "Credential")}
+                      className="text-gray-800 select-all bg-gray-50 hover:bg-blue-50 px-2 py-1 rounded text-xs cursor-pointer transition-colors duration-200 border border-transparent hover:border-blue-200"
+                      title="Click to copy"
+                    >
+                      +918888888888
+                    </button>
                   </div>
                 </div>
                 
                 {/* Helper Text */}
                 <div className="mt-3 pt-3 border-t border-gray-200">
-                  <p className="text-xs text-gray-500">Click anywhere outside to close</p>
+                  <p className="text-xs text-gray-500">Click credentials to copy • Click outside to close</p>
                 </div>
               </div>
             </>
@@ -200,29 +285,67 @@ export default function CustomerForm() {
         <SubmitButton isLoading={isLoading}>Welcome</SubmitButton>
       </form>
 
-      <Dialog open={otpSent} onOpenChange={setOtpSent}>
-  <DialogTrigger asChild>
-    <Button variant="ghost" className="hidden">
-      Open
-    </Button>
-  </DialogTrigger>
-  <DialogContent className="bg-green-600"> {/* Add your background color class here */}
-    <DialogTitle>Enter OTP</DialogTitle>
-    <DialogDescription>
-      Please enter the OTP sent to your phone.
-    </DialogDescription>
-    <Input
-      value={otp}
-      onChange={(e) => setOtp(e.target.value)}
-      placeholder="Enter OTP"
-      className="mb-4"
-    />
-    <DialogFooter>
-      <Button onClick={handleOtpSubmit}>Verify OTP</Button>
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
+      
+
+
+<AlertDialog open={otpSent}>
+      <AlertDialogContent className="shad-alert-dialog">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-start justify-between">
+            Customer Verification
+            <Image
+              src="/assets/icons/close.svg"
+              alt="close"
+              width={20}
+              height={20}
+              onClick={() => closeModal()}
+              className="cursor-pointer"
+            />
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            To access the registration page, please enter the otp recieved.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <div>
+          <InputOTP
+            maxLength={4}
+            value={otp}
+            onChange={(value: any) => setOtp(value)}
+          >
+            <InputOTPGroup className="shad-otp">
+              <InputOTPSlot className="shad-otp-slot" index={0} />
+              <InputOTPSlot className="shad-otp-slot" index={1} />
+              <InputOTPSlot className="shad-otp-slot" index={2} />
+              <InputOTPSlot className="shad-otp-slot" index={3} />
+            </InputOTPGroup>
+          </InputOTP>
+
+          {error && (
+            <p className="shad-error text-14-regular mt-4 flex justify-center">
+              {error}
+            </p>
+          )}
+        </div>
+        <AlertDialogFooter>
+          <AlertDialogAction
+            onClick={handleOtpSubmit}
+            disabled={isLoading}
+            className="shad-primary-btn w-full"
+          >
+            {isLoading ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                Verifying...
+              </div>
+            ) : (
+              "Enter OTP"
+            )}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
 
     </Form>
+    </>
   );
 }
