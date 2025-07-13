@@ -46,6 +46,7 @@ export default function CustomerForm() {
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [userId, setUserId] = useState("");
+  const [isTestUserOpen, setIsTestUserOpen] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(UserFormValidation),
@@ -59,6 +60,12 @@ export default function CustomerForm() {
   async function onSubmit(data: any) {
     setIsLoading(true);
     try {
+      console.log("Form Data:", data);
+      if(data.phone == "+918888888888" && data.email == "test@test.com" && data.name === "Test User") {
+        console.log("Test user detected, redirecting to registration page");
+        router.push(`/customer/${data.phone+"testuser"}/register`);
+        return;
+      }
       const user = await createUser(data);
 
       if (user) {
@@ -96,6 +103,69 @@ export default function CustomerForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 flex-1">
+        {/* Test User Button and Details Section */}
+        <div className="absolute top-4 left-4 z-50">
+          {/* Test User Button */}
+          <button
+            type="button"
+            onClick={() => setIsTestUserOpen(!isTestUserOpen)}
+            className="bg-white/80 backdrop-blur-sm border border-blue-200 rounded-full px-4 py-2 shadow-lg hover:shadow-xl hover:bg-white/90 transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center gap-2"
+          >
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+            <span className="text-sm font-medium text-blue-700">Test User</span>
+          </button>
+
+          {/* Test User Details Popup */}
+          {isTestUserOpen && (
+            <>
+              {/* Backdrop */}
+              <div 
+                className="fixed inset-0 bg-black/10 backdrop-blur-sm"
+                onClick={() => setIsTestUserOpen(false)}
+              ></div>
+              
+              {/* Details Card */}
+              <div className="absolute top-12 left-0 bg-white/95 backdrop-blur-md border border-blue-200 rounded-xl p-4 shadow-xl min-w-[280px] animate-in slide-in-from-top-2 duration-200">
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsTestUserOpen(false)}
+                  className="absolute top-2 right-2 w-6 h-6 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"
+                >
+                  <span className="text-gray-500 text-sm">×</span>
+                </button>
+                
+                {/* Header */}
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <span className="text-sm font-semibold text-blue-700">Test User Credentials</span>
+                </div>
+                
+                {/* Details */}
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-medium text-gray-600">Name:</span>
+                    <span className="text-gray-800 select-all bg-gray-50 px-2 py-1 rounded ">Test User</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-medium text-gray-600">Email:</span>
+                    <span className="text-gray-800 select-all bg-gray-50 px-2 py-1 rounded text-xs">test@test.com</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-medium text-gray-600">Phone:</span>
+                    <span className="text-gray-800 select-all bg-gray-50 px-2 py-1 rounded text-xs">+918888888888</span>
+                  </div>
+                </div>
+                
+                {/* Helper Text */}
+                <div className="mt-3 pt-3 border-t border-gray-200">
+                  <p className="text-xs text-gray-500">Click anywhere outside to close</p>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
         <section className="mb-12 space-y-4">
           <h1 className="header">Hi there 👋</h1>
           <p className="text-dark-700">Let&apos;s Book Your Room</p>
