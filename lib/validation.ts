@@ -52,7 +52,6 @@ export const CustomerFormValidation = z.object({
       (emergencyContactNumber) => /^\+\d{10,15}$/.test(emergencyContactNumber),
       "Invalid phone number",
     ).optional(),
-  primaryPhysician: z.string().min(2, "Select at least one doctor").optional(),
   insuranceProvider: z
     .string()
     .min(2, "Insurance name must be at least 2 characters")
@@ -80,7 +79,6 @@ export const CreateBookingSchema = z.object({
 });
 
 export const ScheduleBookingSchema = z.object({
-  primaryPhysician: z.string().min(2, "Select at least one doctor"),
   schedule: z.coerce.date(),
   reason: z.string().optional(),
   note: z.string().optional(),
@@ -89,7 +87,6 @@ export const ScheduleBookingSchema = z.object({
 });
 
 export const CancelBookingSchema = z.object({
-  primaryPhysician: z.string().min(2, "Select at least one doctor"),
   schedule: z.coerce.date(),
   reason: z.string().optional(),
   note: z.string().optional(),

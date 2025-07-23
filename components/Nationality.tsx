@@ -3,7 +3,6 @@ import Select from "react-select";
 import { css } from "@emotion/css";
 import {
   RoomNumber,
-  Doctors,
   Identificationtypes,
   countries,
 } from "@/constants";

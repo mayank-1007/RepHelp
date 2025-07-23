@@ -5,7 +5,6 @@ import { getCustomer } from "@/lib/actions/customer.actions";
 import Link from "next/link";
 
 const Appointment = async ({ params: { userId } }: SearchParamProps) => {
-  const patient = await getCustomer(userId);
 
   return (
     <div className="flex h-screen max-h-screen">

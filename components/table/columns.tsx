@@ -3,12 +3,12 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 
-import { Doctors, roomTypes } from "@/constants";
+import { roomTypes } from "@/constants";
 import { formatDateTime } from "@/lib/utils";
-import { Appointment } from "@/types/appwrite.types";
 
 import { AppointmentModal } from "../AppointmentModal";
 import { StatusBadge } from "../StatusBadge";
+import { Appointment } from "@/types/appwrite.types";
 
 export const columns: ColumnDef<Appointment>[] = [
   {
@@ -55,20 +55,20 @@ export const columns: ColumnDef<Appointment>[] = [
     cell: ({ row }) => {
       const appointment = row.original;
 
-      const doctor = roomTypes.find(
-        (doctor) => doctor === appointment.room_type,
+      const room = roomTypes.find(
+        (room) => room === appointment.room_type,
       );
 
       return (
         <div className="flex items-center gap-3">
           <Image
             src="/assets/icons/room.svg"
-            alt="doctor"
+            alt="room"
             width={100}
             height={100}
             className="size-8"
           />
-          <p className="whitespace-nowrap">Room Type : {doctor}</p>
+          <p className="whitespace-nowrap">Room Type : {room}</p>
         </div>
       );
     },
@@ -83,14 +83,12 @@ export const columns: ColumnDef<Appointment>[] = [
         <div className="flex gap-1">
           <AppointmentModal
             userId={appointment.userId}
-            appointment={appointment}
             type="schedule"
             title="Schedule Appointment"
             description="Please confirm the following details to schedule."
           />
           <AppointmentModal
             userId={appointment.userId}
-            appointment={appointment}
             type="cancel"
             title="Cancel Appointment"
             description="Are you sure you want to cancel your appointment?"

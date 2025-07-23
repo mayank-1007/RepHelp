@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { Doctors } from "@/constants";
 import { getAppointment } from "@/lib/actions/appointment.actions";
 import { formatDateTime } from "@/lib/utils";
 
@@ -12,10 +11,6 @@ const RequestSuccess = async ({
 }: SearchParamProps) => {
   const appointmentId = (searchParams?.appointmentId as string) || "";
   const appointment = await getAppointment(appointmentId);
-
-  // const doctor = Doctors.find(
-  //   (doctor) => doctor.name === appointment.primaryPhysician,
-  // );
 
   return (
     <div className=" flex h-screen max-h-screen px-[5%]">
@@ -54,7 +49,7 @@ const RequestSuccess = async ({
           <div className="flex items-center gap-3">
             <Image
               src="\assets\icons\room.svg"
-              alt="doctor"
+              alt="room"
               width={100}
               height={100}
               className="size-6"
