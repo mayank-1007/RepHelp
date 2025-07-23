@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
-import { stateData } from '@/constants';
+import React, { useState } from "react";
+import styled, { createGlobalStyle } from "styled-components";
+import { stateData } from "@/constants";
 interface SelectProps {
   value: string | null;
   onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
@@ -38,13 +38,12 @@ const Select = styled.select<SelectProps>`
 `;
 
 const theme = {
-  backgroundColor: '#333',
-  textColor: '#fff',
-  dropdownBackgroundColor: '#444',
-  selectBackgroundColor: '#555',
-  selectTextColor: '#fff',
+  backgroundColor: "#333",
+  textColor: "#fff",
+  dropdownBackgroundColor: "#444",
+  selectBackgroundColor: "#555",
+  selectTextColor: "#fff",
 };
-
 
 const NestedDropdown: React.FC = () => {
   const [selectedState, setSelectedState] = useState<string | null>(null);
@@ -55,7 +54,9 @@ const NestedDropdown: React.FC = () => {
     setSelectedDistrict(null); // Reset district when state changes
   };
 
-  const handleDistrictChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleDistrictChange = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
     setSelectedDistrict(event.target.value);
   };
 
@@ -64,7 +65,12 @@ const NestedDropdown: React.FC = () => {
       <GlobalStyle theme={theme} />
       <DropdownContainer>
         <label htmlFor="state-select">State:</label>
-        <Select id="state-select" value={selectedState || ''} onChange={handleStateChange} title="Select a state">
+        <Select
+          id="state-select"
+          value={selectedState || ""}
+          onChange={handleStateChange}
+          title="Select a state"
+        >
           <option value="">Select State</option>
           {stateData.map((state, index) => (
             <option key={index} value={state.name}>
@@ -75,13 +81,20 @@ const NestedDropdown: React.FC = () => {
         {selectedState && (
           <React.Fragment>
             <label htmlFor="district-select">District:</label>
-            <Select id="district-select" value={selectedDistrict || ''} onChange={handleDistrictChange} title="Select a district">
+            <Select
+              id="district-select"
+              value={selectedDistrict || ""}
+              onChange={handleDistrictChange}
+              title="Select a district"
+            >
               <option value="">Select District</option>
-              {stateData.find((state) => state.name === selectedState)?.districts.map((district, index) => (
-                <option key={index} value={district}>
-                  {district}
-                </option>
-              ))}
+              {stateData
+                .find((state) => state.name === selectedState)
+                ?.districts.map((district, index) => (
+                  <option key={index} value={district}>
+                    {district}
+                  </option>
+                ))}
             </Select>
           </React.Fragment>
         )}

@@ -42,7 +42,7 @@ export const PasskeyModal = () => {
       } else {
         setOpen(true);
       }
-  }, [encryptedKey,path,router]);
+  }, [encryptedKey, path, router]);
 
   const closeModal = () => {
     setOpen(false);
@@ -50,7 +50,7 @@ export const PasskeyModal = () => {
   };
 
   const validatePasskey = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
 
@@ -88,7 +88,7 @@ export const PasskeyModal = () => {
           <InputOTP
             maxLength={6}
             value={passkey}
-            onChange={(value : any) => setPasskey(value)}
+            onChange={(value: any) => setPasskey(value)}
           >
             <InputOTPGroup className="shad-otp">
               <InputOTPSlot className="shad-otp-slot" index={0} />
@@ -108,7 +108,7 @@ export const PasskeyModal = () => {
         </div>
         <AlertDialogFooter>
           <AlertDialogAction
-            onClick={(e : any) => validatePasskey(e)}
+            onClick={(e: any) => validatePasskey(e)}
             className="shad-primary-btn w-full"
           >
             Enter Admin Passkey
@@ -118,5 +118,3 @@ export const PasskeyModal = () => {
     </AlertDialog>
   );
 };
-
-

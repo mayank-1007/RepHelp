@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 
-import { Doctors } from "@/constants";
+import { Doctors, roomTypes } from "@/constants";
 import { formatDateTime } from "@/lib/utils";
 import { Appointment } from "@/types/appwrite.types";
 
@@ -18,11 +18,11 @@ export const columns: ColumnDef<Appointment>[] = [
     },
   },
   {
-    accessorKey: "patient",
-    header: "Patient",
+    accessorKey: "customer",
+    header: "Customer",
     cell: ({ row }) => {
       const appointment = row.original;
-      return <p className="text-14-medium ">{appointment.patient.name}</p>;
+      return <p className="text-14-medium ">{appointment.room_type}</p>;
     },
   },
   {
@@ -32,7 +32,7 @@ export const columns: ColumnDef<Appointment>[] = [
       const appointment = row.original;
       return (
         <div className="min-w-[115px]">
-          <StatusBadge status={appointment.status} />
+          <StatusBadge status={appointment.purpose} />
         </div>
       );
     },
@@ -50,25 +50,25 @@ export const columns: ColumnDef<Appointment>[] = [
     },
   },
   {
-    accessorKey: "primaryPhysician",
-    header: "Doctor",
+    accessorKey: "room_type",
+    header: "Room",
     cell: ({ row }) => {
       const appointment = row.original;
 
-      const doctor = Doctors.find(
-        (doctor) => doctor.name === appointment.primaryPhysician
+      const doctor = roomTypes.find(
+        (doctor) => doctor === appointment.room_type,
       );
 
       return (
         <div className="flex items-center gap-3">
           <Image
-            src={doctor?.image!}
+            src="/assets/icons/room.svg"
             alt="doctor"
             width={100}
             height={100}
             className="size-8"
           />
-          <p className="whitespace-nowrap">Dr. {doctor?.name}</p>
+          <p className="whitespace-nowrap">Room Type : {doctor}</p>
         </div>
       );
     },
@@ -82,7 +82,6 @@ export const columns: ColumnDef<Appointment>[] = [
       return (
         <div className="flex gap-1">
           <AppointmentModal
-            patientId={appointment.patient.$id}
             userId={appointment.userId}
             appointment={appointment}
             type="schedule"
@@ -90,7 +89,6 @@ export const columns: ColumnDef<Appointment>[] = [
             description="Please confirm the following details to schedule."
           />
           <AppointmentModal
-            patientId={appointment.patient.$id}
             userId={appointment.userId}
             appointment={appointment}
             type="cancel"

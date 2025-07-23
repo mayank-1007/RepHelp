@@ -1,111 +1,158 @@
-"use client"
- 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import CustomFormField from "../CustomFormField"
-import SubmitButton from '@/components/SubmitButton';
-import { UserFormValidation } from "@/lib/validation"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { createUser } from "@/lib/actions/customer.actions"
+// pages/CustomerForm.tsx
 
+"use client"; // Mark this file as a Client Component
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
+import CustomFormField from "@/components/CustomFormField";
+import SubmitButton from "@/components/SubmitButton";
+import { Input } from "@/components/ui/input";
+// import { UserFormValidation } from "@/lib/validation";
+import { useState } from "react";
+import { useRouter } from "next/navigation"; // Updated import for Next.js App Router
+import { createUser, sendOtp, verifyOtp } from "@/lib/actions/customer.actions";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export enum FormFieldType {
-    INPUT = 'input',
-    TEXTAREA = 'textarea',
-    PHONE_INPUT= 'phoneInput',
-    CHECKBOX='checkbox',
-    DATE_PICKER = 'datePicker',
-    DROPDOWN = 'dropdown',
-    SELECT = 'select',
-    SKELETON = 'skeleton',
+  INPUT = "input",
+  TEXTAREA = "textarea",
+  PHONE_INPUT = "phoneInput",
+  CHECKBOX = "checkbox",
+  DATE_PICKER = "datePicker",
+  DROPDOWN = "dropdown",
+  SELECT = "select",
+  SKELETON = "skeleton",
 }
- 
 
- 
+const UserFormValidation = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(10, "Phone number is required"),
+});
+
 export default function CustomerForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  // 1. Define your form.
-  const form = useForm<z.infer<typeof UserFormValidation>>({
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [userId, setUserId] = useState("");
+
+  const form = useForm({
     resolver: zodResolver(UserFormValidation),
     defaultValues: {
       name: "",
       email: "",
       phone: "",
     },
-  })
- 
-  async function onSubmit({name, email, phone}: z.infer<typeof UserFormValidation>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
+  });
+
+  async function onSubmit(data: any) {
     setIsLoading(true);
     try {
-      const userData = {
-        name,
-        email,
-        phone,
+      const user = await createUser(data);
+
+      if (user) {
+        setUserId(user.$id);
+
+        const otpResponse = await sendOtp(data.phone, user.$id, data.email,data.name);
+
+        if (otpResponse.success) {
+          setOtpSent(true);
+        } else {
+          console.error("Failed to send OTP");
+        }
       }
-      console.log(userData);
-      const user = await createUser(userData);
-      if(user){
-        router.push(`/customer/${user.$id}/register`)
-        console.log(user);
-      }
-    }
-    catch(error) {
+    } catch (error) {
       console.log(error);
     }
     setIsLoading(false);
   }
-    return(
-        <Form {...form}>
+
+  async function handleOtpSubmit() {
+    setIsLoading(true);
+    try {
+      const verifyResponse = await verifyOtp(userId, otp);
+      if (verifyResponse.success) {
+        router.push(`/customer/${userId}/register`);
+      } else {
+        console.error("Failed to verify OTP", verifyResponse.error);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    setIsLoading(false);
+  }
+
+  return (
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 flex-1">
         <section className="mb-12 space-y-4">
-            <h1  className="header">Hi there 👋</h1>
-            <p  className="text-dark-700">Let&apos;s  Book  Your  Room</p>
+          <h1 className="header">Hi there 👋</h1>
+          <p className="text-dark-700">Let&apos;s Book Your Room</p>
         </section>
         <CustomFormField
-            fieldType={FormFieldType.INPUT}
-            control={form.control}
-            name="name"
-            label="Full name"
-            placeholder="Krishna"
-            iconSrc="/assets/icons/user.svg"
-            iconAlt="user"
+          fieldType={FormFieldType.INPUT}
+          control={form.control}
+          name="name"
+          label="Full name"
+          placeholder="Krishna"
+          iconSrc="/assets/icons/user.svg"
+          iconAlt="user"
         />
         <CustomFormField
-            fieldType={FormFieldType.INPUT}
-            control={form.control}
-            name="email"
-            label="Email"
-            placeholder="krishna2005@gmail.com"
-            iconSrc="/assets/icons/email.svg"
-            iconAlt="email"
+          fieldType={FormFieldType.INPUT}
+          control={form.control}
+          name="email"
+          label="Email"
+          placeholder="krishna2005@gmail.com"
+          iconSrc="/assets/icons/email.svg"
+          iconAlt="email"
         />
         <CustomFormField
-            fieldType={FormFieldType.PHONE_INPUT}
-            control={form.control}
-            name="phone"
-            label="Phone No."
-            placeholder="(+91) 8595673410"
-            iconSrc="/assets/icons/email.svg"
-            iconAlt="email"
+          fieldType={FormFieldType.PHONE_INPUT}
+          control={form.control}
+          name="phone"
+          label="Phone No."
+          placeholder="(+91) 8595673410"
+          iconSrc="/assets/icons/phoneInput.svg"
+          iconAlt="phoneInput"
         />
         <SubmitButton isLoading={isLoading}>Welcome</SubmitButton>
       </form>
+
+      <Dialog open={otpSent} onOpenChange={setOtpSent}>
+  <DialogTrigger asChild>
+    <Button variant="ghost" className="hidden">
+      Open
+    </Button>
+  </DialogTrigger>
+  <DialogContent className="bg-green-600"> {/* Add your background color class here */}
+    <DialogTitle>Enter OTP</DialogTitle>
+    <DialogDescription>
+      Please enter the OTP sent to your phone.
+    </DialogDescription>
+    <Input
+      value={otp}
+      onChange={(e) => setOtp(e.target.value)}
+      placeholder="Enter OTP"
+      className="mb-4"
+    />
+    <DialogFooter>
+      <Button onClick={handleOtpSubmit}>Verify OTP</Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
     </Form>
-    )
+  );
 }
