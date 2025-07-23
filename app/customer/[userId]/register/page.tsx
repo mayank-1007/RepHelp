@@ -3,10 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import RegisterForm from "@/components/form/RegisterForm";
 import { getUser } from "@/lib/actions/customer.actions";
-
-// Force dynamic rendering to prevent static generation issues
-export const dynamic = 'force-dynamic';
-
 const Register = async ({ params: { userId } }: SearchParamProps) => {
   const user = await getUser(userId);
   return (

@@ -27,7 +27,9 @@ const DocumentTypeSelector: React.FC = () => {
                 }
             }
         }
-    };    useEffect(() => {
+    };
+
+    useEffect(() => {
         // Set up video stream
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
@@ -43,7 +45,7 @@ const DocumentTypeSelector: React.FC = () => {
         setTimeout(() => clearInterval(interval), 5000);
 
         return () => clearInterval(interval);
-    }, [documentType, captureImage]);
+    }, [documentType]);
 
     return (
         <div>

@@ -6,52 +6,12 @@ import { Doctors } from "@/constants";
 import { getAppointment } from "@/lib/actions/appointment.actions";
 import { formatDateTime } from "@/lib/utils";
 
-// Force dynamic rendering to prevent static generation issues
-export const dynamic = 'force-dynamic';
-
 const RequestSuccess = async ({
   searchParams,
   params: { userId },
 }: SearchParamProps) => {
   const appointmentId = (searchParams?.appointmentId as string) || "";
   const appointment = await getAppointment(appointmentId);
-
-  // Handle case when appointment is null or undefined
-  if (!appointment) {
-    return (
-      <div className="flex h-screen max-h-screen px-[5%]">
-        <div className="success-img">
-          <Link href={`/customer/${userId}/new-booking`} className="flex-row cursor-pointer mt-7 mb-1">
-            <div className="flex flex-row gap-1 xl:flex-row">
-              <Image
-                src="/assets/icons/Logo.svg"
-                height={1000}
-                width={1000}
-                alt="logo"
-                className="h-14 w-fit"
-              />
-              <span className=" text-3xl font-bold font-italic mt-2 ml-5 mb-12 relative">
-                RepHelp
-              </span>
-            </div>
-          </Link>
-
-          <section className="flex flex-col items-center">
-            <h2 className="header mb-6 max-w-[600px] text-center">
-              <span className="text-green-500">Booking request</span> submitted!
-            </h2>
-            <p>Our team will be in touch shortly to confirm your booking.</p>
-          </section>
-
-          <Button variant="outline" className="shad-primary-btn" asChild>
-            <Link href={`/customer/${userId}/new-booking`}>New Booking</Link>
-          </Button>
-
-          <p className="copyright">© 2024 Rephelp</p>
-        </div>
-      </div>
-    );
-  }
 
   // const doctor = Doctors.find(
   //   (doctor) => doctor.name === appointment.primaryPhysician,

@@ -14,7 +14,7 @@ import {
 import { parseStringify } from "../utils";
 import { InputFile } from "node-appwrite/file";
 import { sendEmail } from "@/lib/email";
-// import { UserBindingInstance } from "twilio/lib/rest/ipMessaging/v2/service/user/userBinding";
+import { UserBindingInstance } from "twilio/lib/rest/ipMessaging/v2/service/user/userBinding";
 
 export const createUser = async (user: CreateUserParams) => {
   try {
@@ -58,15 +58,9 @@ export const getUser = async (userId: string) => {
 
 export const registerCustomer = async ({
   userId, // Assuming `id` is part of RegisterUserParams and used to identify the document
-  ...customer // This will capture all other properties from RegisterUserParams
+  ...customer
 }: RegisterUserParams) => {
   try {
-    // Check if required environment variables are present
-    if (!DATABASE_ID || !CUSTOMERDETAIL_COLLECTION_ID) {
-      console.error("Missing required environment variables: DATABASE_ID or CUSTOMERDETAIL_COLLECTION_ID");
-      throw new Error("Database configuration is missing");
-    }
-
     // Check if the document exists
     let existingCustomer;
     if (userId) {
@@ -76,8 +70,9 @@ export const registerCustomer = async ({
           CUSTOMERDETAIL_COLLECTION_ID!,
           userId
         );
-      } catch (error: any) {
-        if (error.code === 404) { // Appwrite specific error code for 'Document not found'
+      } catch (error) {
+        // If the document does not exist, we can ignore the error
+        if (error) {
           existingCustomer = null;
         } else {
           throw error;
@@ -85,63 +80,43 @@ export const registerCustomer = async ({
       }
     }
 
-    // Prepare all customer data directly from the customer object passed in
-    const customerDataToSave = {
-      ...customer, // Spread all properties from the customer object
-      userId: userId, // Ensure userId is part of the data to save
-      // Convert date strings to Date objects if necessary, Appwrite typically handles ISO strings
-      birthDate: customer.birthDate ? new Date(customer.birthDate) : undefined,
-      check_in: customer.check_in ? new Date(customer.check_in) : undefined,
-      check_out: customer.check_out ? new Date(customer.check_out) : undefined,
-      // Ensure fileds like identificationDocument and customer_image are handled correctly
-      // If they are file uploads, their IDs/URLs from storage should be used here.
-      // If they are already string URLs or base64, they can be passed directly.
-      // Example: identificationDocument: customer.identificationDocument, (if it's already a URL/ID)
-    };
-
     if (existingCustomer) {
-      if (typeof userId !== 'string') {
-        throw new Error('User ID is invalid.');
-      }
+      const userId = UserBindingInstance; // or however you access the document ID
+
+// Ensure userId is a string
+    if (typeof userId !== 'string') {
+      throw new Error('UserBindingInstance does not have a valid ID.');
+    }
       // Update the existing document
       const updatedCustomer = await databases.updateDocument(
         DATABASE_ID!,
-        CUSTOMERDETAIL_COLLECTION_ID!,
-        userId, // Use the userId which should be the document ID for this collection if designed that way
-        customerDataToSave
+        CUSTOMER_COLLECTION_ID!,
+        userId,
+        {
+          ...customer,
+        }
       );
       return parseStringify(updatedCustomer);
     } else {
       // Create a new document
-      // If userId is meant to be the document ID, it should be unique.
-      // If Appwrite is to generate a unique ID, use ID.unique() and store userId as a field.
       const newCustomer = await databases.createDocument(
         DATABASE_ID!,
         CUSTOMERDETAIL_COLLECTION_ID!,
-        userId || ID.unique(), // Use userId if provided and it's intended as document ID, else generate unique ID
-        customerDataToSave
+        ID.unique(),
+        {
+          ...customer,
+        }
       );
       return parseStringify(newCustomer);
     }
   } catch (error) {
-    console.error("An error occurred while registering a customer:", error);
-    // It's good practice to throw the error or return an error object
-    // to be handled by the caller function in the component.
-    // For example: return { error: error.message };
-    // For now, re-throwing to see the error in logs or handle it upstream.
-    throw error;
+    console.log("An error occurred while registering a customer:", error);
   }
 };
 
 
 export const getCustomer = async (userId: string) => {
   try {
-    // Check if required environment variables are present
-    if (!DATABASE_ID || !CUSTOMER_COLLECTION_ID) {
-      console.error("Missing required environment variables: DATABASE_ID or CUSTOMER_COLLECTION_ID");
-      return null;
-    }
-
     const customers = await databases.listDocuments(
       DATABASE_ID!,
       CUSTOMER_COLLECTION_ID!,
@@ -154,7 +129,6 @@ export const getCustomer = async (userId: string) => {
       "An error occurred while retrieving the patient details:",
       error,
     );
-    return null;
   }
 };
 const otpStore: { [userId: string]: { otp: string, expiresAt: number } } = {
@@ -163,19 +137,13 @@ const otpStore: { [userId: string]: { otp: string, expiresAt: number } } = {
 
 export async function sendOtp(phone: string, userId: string, email: string, name: string) {
   try {
-    // Check if required environment variables are present
-    if (!DATABASE_ID || !CUSTOMER_COLLECTION_ID) {
-      console.error("Missing required environment variables: DATABASE_ID or CUSTOMER_COLLECTION_ID");
-      return { success: false, error: "Database configuration is missing" };
-    }
-
     // Generate a 4-digit OTP
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
     // Check if a document with the given userId already exists
     const existingDocuments = await databases.listDocuments(
-      DATABASE_ID!,
-      CUSTOMER_COLLECTION_ID!,
+      process.env.DATABASE_ID || "",          // Ensure DATABASE_ID is provided
+      process.env.CUSTOMER_COLLECTION_ID || "", // Ensure CUSTOMER_COLLECTION_ID is provided
       [/* filters if needed */], // Adjust if you need to filter based on specific fields
     );
 
@@ -184,8 +152,8 @@ export async function sendOtp(phone: string, userId: string, email: string, name
     if (existingDocument) {
       // If document exists, update it with the new OTP (if needed)
       await databases.updateDocument(
-        DATABASE_ID!,
-        CUSTOMER_COLLECTION_ID!,
+        process.env.DATABASE_ID || "",
+        process.env.CUSTOMER_COLLECTION_ID || "",
         existingDocument.$id, // ID of the existing document
         { 
           name : name,
@@ -197,8 +165,8 @@ export async function sendOtp(phone: string, userId: string, email: string, name
     } else {
       // Create a new document with the OTP
       await databases.createDocument(
-        DATABASE_ID!,
-        CUSTOMER_COLLECTION_ID!,
+        process.env.DATABASE_ID || "",
+        process.env.CUSTOMER_COLLECTION_ID || "",
         userId, // This should be a unique ID, or you can use another unique field
         { 
           userId: userId,
@@ -235,16 +203,10 @@ export async function sendOtp(phone: string, userId: string, email: string, name
 
 export async function verifyOtp(userId: string, enteredOtp: string) {
   try {
-    // Check if required environment variables are present
-    if (!DATABASE_ID || !CUSTOMER_COLLECTION_ID) {
-      console.error("Missing required environment variables: DATABASE_ID or CUSTOMER_COLLECTION_ID");
-      return { success: false, error: "Database configuration is missing" };
-    }
-
     // Fetch the document from the database
     const document = await databases.getDocument(
-      DATABASE_ID!,
-      CUSTOMER_COLLECTION_ID!,
+      process.env.DATABASE_ID || "",
+      process.env.CUSTOMER_COLLECTION_ID || "",
       userId
     );
 
@@ -252,8 +214,8 @@ export async function verifyOtp(userId: string, enteredOtp: string) {
     if (document.otp === enteredOtp) {
       // OTP is correct, update the document
       await databases.updateDocument(
-        DATABASE_ID!,
-        CUSTOMER_COLLECTION_ID!,
+        process.env.DATABASE_ID || "",
+        process.env.CUSTOMER_COLLECTION_ID || "",
         userId,
         { otpVerified: true } // Ensure otpVerified field exists in your schema
       );

@@ -6,19 +6,8 @@ import { columns } from "@/components/table/columns";
 import { DataTable } from "@/components/table/DataTable";
 import { getRecentAppointmentList } from "@/lib/actions/appointment.actions";
 
-// Force dynamic rendering to prevent static generation issues
-export const dynamic = 'force-dynamic';
-
 const AdminPage = async () => {
   const appointments = await getRecentAppointmentList();
-
-  // Ensure appointments has default values if undefined
-  const safeAppointments = appointments || {
-    scheduledCount: 0,
-    pendingCount: 0,
-    cancelledCount: 0,
-    documents: []
-  };
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col space-y-14">
@@ -49,28 +38,30 @@ const AdminPage = async () => {
           <pre className="text-dark-700">
             Start the day with managing the bookings.
           </pre>
-        </section>        <section className="admin-stat">
+        </section>
+
+        <section className="admin-stat">
           <StatCard
             type="appointments"
-            count={safeAppointments.scheduledCount || 0}
+            count={appointments.total || 0}
             label="Scheduled Booking"
             icon={"/assets/icons/appointments.svg"}
           />
           <StatCard
             type="pending"
-            count={safeAppointments.pendingCount || 0}
+            count={appointments.pendingCount || 0}
             label="Pending Booking"
             icon={"/assets/icons/pending.svg"}
           />
           <StatCard
             type="cancelled"
-            count={safeAppointments.cancelledCount || 0}
+            count={appointments.cancelledCount || 0}
             label="Cancelled Booking"
             icon={"/assets/icons/cancelled.svg"}
           />
         </section>
 
-        <DataTable columns={columns || []} data={safeAppointments.documents || []} />
+        <DataTable columns={columns || []} data={appointments.documents || ""} />
       </main>
     </div>
   );
