@@ -1,129 +1,204 @@
-# RepHelp - Reception Management System
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) <!-- Optional: Add license if applicable -->
+# RepHelp - hotel Management System
 
-<p align="center">
-  <!-- Optional: Add a logo if you have one -->
-  <!-- <img src="path/to/your/logo.png" alt="RepHelp Logo" width="200"/> -->
-  <br />
-  <i>Streamlining Reception Operations</i>
-</p>
+<div align="center">
+  <img src="./public/assets/icons/Logo.svg" alt="RepHelp Logo" width="100" />
+  <h1>RepHelp</h1>
+</div>
 
-RepHelp is a modern web application designed to simplify and automate reception tasks, focusing on customer registration and booking management. It provides a user-friendly interface for customers and a comprehensive dashboard for administrators.
+<div align="center">
 
-**Live Demo:** [[RepHelp](https://rephelp.netlify.app/)] <!-- Add your deployment link here -->
+A modern, full-stack hotel management and appointment scheduling application built with Next.js, Appwrite, and TypeScript.
 
-## ✨ Features
+</div>
 
-*   **Customer Onboarding:**
-    *   Simple customer registration form ([`CustomerForm.tsx`](c:\Users\srishti\Desktop\all\Projects\RepHelp\components\form\CustomerForm.tsx)).
-    *   Detailed customer information capture including personal details, contact info, identification, and more ([`RegisterForm.tsx`](c:\Users\srishti\Desktop\all\Projects\RepHelp\components\form\RegisterForm.tsx)).
-    *   Phone number verification via OTP (using Twilio/Email - [`send-otp.ts`](c:\Users\srishti\Desktop\all\Projects\RepHelp\pages\api\send-otp.ts)).
-    *   Customer image capture ([`CustomerImage.tsx`](c:\Users\srishti\Desktop\all\Projects\RepHelp\components\CustomerImage.tsx)).
-    *   Identification document upload and OCR scanning ([`DocumentImage.tsx`](c:\Users\srishti\Desktop\all\Projects\RepHelp\components\DocumentImage.tsx)).
-    *   Digital signature capture ([`SignaturePad.tsx`](c:\Users\srishti\Desktop\all\Projects\RepHelp\components\SignaturePad.tsx)).
-*   **Booking Management:**
-    *   Intuitive booking form for selecting room types, dates, and purpose ([`AppointmentForm.tsx`](c:\Users\srishti\Desktop\all\Projects\RepHelp\components\form\AppointmentForm.tsx)).
-    *   View booking success/confirmation page ([`success/page.tsx`](c:\Users\srishti\Desktop\all\Projects\RepHelp\app\customer\[userId]\new-booking\success\page.tsx)).
-*   **Admin Dashboard:**
-    *   Overview of booking statistics (Total, Pending, Cancelled) ([`admin/page.tsx`](c:\Users\srishti\Desktop\all\Projects\RepHelp\app\admin\page.tsx)).
-    *   Detailed table view of all bookings ([`DataTable.tsx`](c:\Users\srishti\Desktop\all\Projects\RepHelp\components\table\DataTable.tsx)).
-    *   Actions to manage bookings (e.g., schedule, cancel - [`columns.tsx`](c:\Users\srishti\Desktop\all\Projects\RepHelp\components\table\columns.tsx)).
-    *   Secure admin access (potentially via Passkey - [`PasskeyModal.tsx`](c:\Users\srishti\Desktop\all\Projects\RepHelp\components\PasskeyModal.tsx)).
-*   **Modern UI/UX:**
-    *   Built with Shadcn UI and Tailwind CSS for a clean and responsive design ([`globals.css`](c:\Users\srishti\Desktop\all\Projects\RepHelp\app\globals.css), [`components/ui`](c:\Users\srishti\Desktop\all\Projects\RepHelp\components\ui)).
-    *   Dark theme support ([`theme-provider.tsx`](c:\Users\srishti\Desktop\all\Projects\RepHelp\components\theme-provider.tsx)).
+---
 
-## 🚀 Tech Stack
+## 📖 About The Project
 
-*   **Frontend:** Next.js, React, TypeScript, Tailwind CSS, Shadcn UI
-*   **Backend:** Appwrite (Cloud Database, Auth, Storage, Functions), Node.js (API Routes)
-*   **Form Handling:** React Hook Form, Zod (Validation)
-*   **UI Components:** Radix UI (Primitives for Shadcn), Lucide Icons
-*   **External Services:**
-    *   Twilio (SMS OTP)
-    *   Nodemailer (Email OTP/Notifications)
-    *   RapidAPI (OCR Service)
-*   **Utilities:** `clsx`, `tailwind-merge`, `date-fns` (implied by date formatting)
-*   **Error Monitoring:** Sentry
+RepHelp is a comprehensive solution designed to streamline hotel administration and appointment booking for rooms facilities. It offers a user-friendly interface for hotels to register and book appointments, and a secure, feature-rich dashboard for administrators to manage the system efficiently. The project leverages modern web technologies to provide a seamless, secure, and responsive experience.
 
-## 🛠️ Getting Started
+---
+
+### ✨ Key Features
+
+*   **📝 hotel Registration:** A multi-step, user-friendly form for new hotels to enter their personal and medical information.
+*   **🗓️ Appointment Scheduling:** An intuitive system for hotels to digitally book rooms.
+*   **🔐 Secure Admin Dashboard:** A passkey-protected portal for administrators to manage hotel data, appointments, and system settings.
+*   **👁️ Document OCR Scanning:** Integrated Tesseract.js to scan documents like ID cards and extract information automatically, reducing manual data entry.
+*   **📱 OTP Verification:** Twilio integration for verifying hotel phone numbers, enhancing security and data integrity.
+*   **📊 Status Dashboards:** Visual dashboards for tracking appointment statuses (Scheduled, Pending, Cancelled).
+*   **📧 Email Notifications:** Automated email confirmations and reminders for appointments using Nodemailer.
+*   **🎨 Responsive Design:** Fully responsive UI built with Tailwind CSS and Shadcn/ui, ensuring a great experience on any device.
+
+---
+
+## 🚀 Live Demo & Screenshots
+  [**View Live Demo**](https://rephelp.netlify.app) 
+-
+
+### Live Demo
+*The whole booking flow of my webApp.*
+
+![Live Demo video](public\assets\gifs\liveDemo.gif)
+
+
+### 🏠 Home & Registration Page
+
+*A glimpse of the hotel registration flow.*
+
+![RepHelp Home Page](public\assets\DemoImages\Home.png)
+<br/>
+
+![RepHelp Home Page](public\assets\DemoImages\Register.png)
+<br/>
+
+### 🔒 Admin Dashboard
+
+*The central hub for managing hotels and appointments.*
+
+![RepHelp Admin Dashboard](public\assets\DemoImages\Admin.png)
+<br/>
+
+### 📅 New Appointment Booking
+
+*The simple process for scheduling a new appointment.*
+
+![RepHelp Appointment Booking](public\assets\DemoImages\Booking.png)
+<br/>
+
+![RepHelp Appointment Confirmation](public\assets\DemoImages\Confirm.png)
+<br/>
+
+---
+
+## 🛠️ Tech Stack
+
+This project is built with a modern and robust technology stack:
+
+| Category              | Technology                                                                                             |
+| --------------------- | ------------------------------------------------------------------------------------------------------ |
+| **Frontend**          | [**Next.js 14**](https://nextjs.org/), [**React 18**](https://react.dev/), [**TypeScript**](https://www.typescriptlang.org/) |
+| **Backend & Database**| [**Appwrite**](https://appwrite.io/) (Cloud)                                                           |
+| **Styling**           | [**Tailwind CSS**](https://tailwindcss.com/), [**Shadcn/ui**](https://ui.shadcn.com/)                     |
+| **Form Management**   | [**React Hook Form**](https://react-hook-form.com/), [**Zod**](https://zod.dev/)                         |
+| **API & Server**      | [**Next.js API Routes**](https://nextjs.org/docs/pages/building-your-application/routing/api-routes), [**Node.js**](https://nodejs.org/) |
+| **Communication**     | [**Twilio**](https://www.twilio.com/) (SMS/OTP), [**Nodemailer**](https://nodemailer.com/) (Email)       |
+| **OCR**               | [**Tesseract.js**](https://tesseract.projectnaptha.com/)                                                 |
+| **Error Monitoring**  | [**Sentry**](https://sentry.io/)                                                                         |
+| **Deployment**        | [**Vercel**](https://vercel.com/)                                                                        |
+
+---
+
+## ⚙️ Getting Started
+
+To get a local copy up and running, follow these simple steps.
 
 ### Prerequisites
 
-*   Node.js (v18 or later recommended)
-*   npm or yarn or pnpm
-*   Appwrite Cloud Account
-*   Twilio Account (Optional, for SMS OTP)
-*   RapidAPI Account (Optional, for OCR)
+Make sure you have the following installed on your machine:
+*   [Node.js](https://nodejs.org/en/) (v20.x or higher)
+*   [npm](https://www.npmjs.com/) (v10.x or higher) or [yarn](https://yarnpkg.com/)
 
-### Installation
+### Installation & Setup
 
 1.  **Clone the repository:**
-    ```bash
-    git clone <your-repository-url>
-    cd RepHelp
+    ```sh
+    git clone https://github.com/mayank-1007/rephelp.git
+    cd rephelp
     ```
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    # or
-    yarn install
-    # or
-    pnpm install
-    ```
-3.  **Set up Environment Variables:**
-    Create a `.env.local` file in the root directory and add the necessary environment variables. Refer to the Appwrite, Twilio, and RapidAPI documentation for required keys.
-    ```env
-    # Appwrite
-    PROJECT_ID=your_appwrite_project_id
-    API_KEY=your_appwrite_api_key
-    DATABASE_ID=your_appwrite_database_id
-    CUSTOMER_COLLECTION_ID=your_customer_collection_id
-    CUSTOMERDETAIL_COLLECTION_ID=your_customer_detail_collection_id
-    BOOKING_COLLECTION_ID=your_booking_collection_id
-    NEXT_PUBLIC_BUCKET_ID=your_appwrite_bucket_id
-    NEXT_PUBLIC_ENDPOINT=your_appwrite_endpoint # e.g., https://cloud.appwrite.io/v1
 
-    # Twilio (Optional)
+2.  **Install dependencies:**
+    ```sh
+    npm install
+    ```
+
+3.  **Set up environment variables:**
+    Create a `.env.local` file in the root of your project and add the following environment variables. You will need to create accounts and get credentials from the respective services.
+
+    ```env
+    # Appwrite Configuration
+    NEXT_PUBLIC_APPWRITE_PROJECT_ID=your_appwrite_project_id
+    NEXT_PUBLIC_APPWRITE_API_KEY=your_appwrite_api_key
+    NEXT_PUBLIC_DATABASE_ID=your_appwrite_database_id
+    NEXT_PUBLIC_hotel_COLLECTION_ID=your_hotel_collection_id
+    NEXT_PUBLIC_APPOINTMENT_COLLECTION_ID=your_appointment_collection_id
+    NEXT_PUBLIC_BUCKET_ID=your_appwrite_storage_bucket_id
+    NEXT_PUBLIC_ENDPOINT=https://cloud.appwrite.io/v1
+
+    # Twilio Configuration
     TWILIO_ACCOUNT_SID=your_twilio_account_sid
     TWILIO_AUTH_TOKEN=your_twilio_auth_token
     TWILIO_PHONE_NUMBER=your_twilio_phone_number
 
-    # RapidAPI OCR (Optional)
-    RAPIDAPI_OCR_KEY=your_rapidapi_key
-    RAPIDAPI_OCR_HOST=ocr43.p.rapidapi.com # Or your specific host
+    # Nodemailer Configuration (using Gmail as an example)
+    NODEMAILER_EMAIL=your_email@gmail.com
+    NODEMAILER_PW=your_gmail_app_password
 
-    # Admin Passkey (Example)
-    NEXT_PUBLIC_ADMIN_PASSKEY=your_admin_passkey
-
-    # Other necessary variables...
+    # Admin Passkey
+    # This is a simple secret to access the admin modal. 
+    # In a real-world scenario, use a more robust authentication mechanism.
+    ADMIN_PASSKEY=your_secret_admin_passkey
     ```
-    *Note: Ensure your Appwrite collections (`CUSTOMER_COLLECTION_ID`, `CUSTOMERDETAIL_COLLECTION_ID`, `BOOKING_COLLECTION_ID`) are set up with the correct attributes based on the application's needs (see [`types/appwrite.types.ts`](c:\Users\srishti\Desktop\all\Projects\RepHelp\types\appwrite.types.ts) and action files).*
 
 4.  **Run the development server:**
-    ```bash
+    ```sh
     npm run dev
-    # or
-    yarn dev
-    # or
-    pnpm dev
     ```
-5.  Open [http://localhost:3000](http://localhost:3000) (or your configured port) in your browser.
 
-### Building for Production
+5.  **Open the application:**
+    Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-```bash
-npm run build
-npm run start
+---
+
+## 🚀 Deployment
+
+The application is deployed using Netlify.
+
+Deployment Link - https://rephelp.netlify.app
+
+---
+
+## 📂 Project Structure
+
+The project follows a standard Next.js `app` directory structure:
+
+```
+/
+├── app/                # Main application routes and UI
+│   ├── (pages)/        # Route groups
+│   │   ├── admin/
+│   │   └── customer/
+│   ├── api/            # API routes (OCR, OTP)
+│   ├── layout.tsx      # Root layout
+│   └── page.tsx        # Home page
+├── components/         # Reusable React components
+│   ├── forms/          # Form components (Register, Appointment)
+│   ├── table/          # Reusable data table
+│   └── ui/             # UI elements from Shadcn
+├── constants/          # Application constants
+├── lib/                # Core logic, utilities, and actions
+│   ├── actions/        # Server actions for data fetching/mutation
+│   └── config/         # Configuration files (e.g., Appwrite)
+├── public/             # Static assets (images, icons)
+└── types/              # TypeScript type definitions
 ```
 
-## 🤝 Contributing
-
-Contributions are welcome! Please follow standard fork-and-pull-request workflows. Ensure your code adheres to the project's linting rules (`npm run lint`).
+---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details (if you add one).
+This project is licensed under the MIT License. See the `LICENSE` file for more details.
+
+<!-- CREATE A LICENSE FILE IF YOU DON'T HAVE ONE -->
+<!-- Example:
+## 📄 License
+Distributed under the MIT License. See `LICENSE.txt` for more information.
+-->
 
 ---
+
+<div align="center">
+  <p>Developed with ❤️ by <strong>Mayank Manchanda</strong></p>
+</div>
+
