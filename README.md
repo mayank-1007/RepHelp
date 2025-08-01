@@ -40,34 +40,34 @@ RepHelp is a comprehensive solution designed to streamline hotel administration 
 ### Live Demo
 *The whole booking flow of my webApp.*
 
-![Live Demo video](public\assets\gifs\liveDemo.gif)
+![Live Demo video](public/assets/gifs/liveDemo.gif)
 
 
 ### 🏠 Home & Registration Page
 
 *A glimpse of the hotel registration flow.*
 
-![RepHelp Home Page](public\assets\DemoImages\Home.png)
+![RepHelp Home Page](public/assets/DemoImages/Home.png)
 <br/>
 
-![RepHelp Home Page](public\assets\DemoImages\Register.png)
+![RepHelp Home Page](public/assets/DemoImages/Register.png)
 <br/>
 
 ### 🔒 Admin Dashboard
 
 *The central hub for managing hotels and appointments.*
 
-![RepHelp Admin Dashboard](public\assets\DemoImages\Admin.png)
+![RepHelp Admin Dashboard](public/assets/DemoImages/Admin.png)
 <br/>
 
 ### 📅 New Appointment Booking
 
 *The simple process for scheduling a new appointment.*
 
-![RepHelp Appointment Booking](public\assets\DemoImages\Booking.png)
+![RepHelp Appointment Booking](public/assets/DemoImages/Booking.png)
 <br/>
 
-![RepHelp Appointment Confirmation](public\assets\DemoImages\Confirm.png)
+![RepHelp Appointment Confirmation](public/assets/DemoImages/Confirm.png)
 <br/>
 
 ---
