@@ -176,7 +176,7 @@ export default function CustomerForm() {
             </div>
           ) : (
             <>
-              <div className="flex justify-center">
+              <div className="">
                 <InputOTP
                   maxLength={6}
                   value={otp}
