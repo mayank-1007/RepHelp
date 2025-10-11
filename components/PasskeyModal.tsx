@@ -32,7 +32,9 @@ export const PasskeyModal = () => {
 
   useEffect(() => {
     setMounted(true);
-    
+  }, []);
+
+  useEffect(() => {
     // Only show modal if on admin path
     if (path === "/admin") {
       // Check if user is authenticated in this session
@@ -47,15 +49,21 @@ export const PasskeyModal = () => {
           setOpen(true);
         }
       }
+    } else {
+      setOpen(false);
     }
   }, [path]);
 
   const closeModal = () => {
-    setOpen(false);
-    toast.info("Authentication cancelled");
-    setTimeout(() => {
-      router.push("/");
-    }, 500);
+    // Only redirect if user explicitly clicks close button
+    toast.info("Authentication required to access admin panel");
+    router.push("/");
+  };
+
+  const handleOpenChange = (newOpen: boolean) => {
+    // Prevent closing the modal by ignoring the state change
+    // User can only close via the X button which calls closeModal
+    return;
   };
 
   const validatePasskey = (
@@ -112,7 +120,7 @@ export const PasskeyModal = () => {
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent className="shad-alert-dialog">
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-start justify-between">
