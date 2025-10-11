@@ -54,7 +54,7 @@ const RequestSuccess = async ({
               height={100}
               className="size-6"
             />
-            <p className="whitespace-nowrap">Room Type : {appointment.room_type}</p>
+            <p className="whitespace-nowrap">Number of Rooms: {appointment?.numberOfRooms || 'N/A'}</p>
           </div>
           <div className="flex gap-2">
             <Image
@@ -63,7 +63,7 @@ const RequestSuccess = async ({
               width={24}
               alt="calendar"
             />
-            <p> Checkout DateTime : {appointment.schedule?formatDateTime(appointment.schedule).dateTime : (new Date()).toISOString().split('T')[0]}</p>
+            <p> Check-in Date: {appointment?.checkInDate ? formatDateTime(appointment.checkInDate).dateTime : 'N/A'}</p>
           </div>
         </section>
 

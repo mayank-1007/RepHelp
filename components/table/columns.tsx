@@ -3,9 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 
-import { roomTypes } from "@/constants";
 import { formatDateTime } from "@/lib/utils";
-
 import { AppointmentModal } from "../AppointmentModal";
 import { StatusBadge } from "../StatusBadge";
 import { Appointment } from "@/types/appwrite.types";
@@ -14,7 +12,13 @@ export const columns: ColumnDef<Appointment>[] = [
   {
     header: "#",
     cell: ({ row }) => {
-      return <p className="text-14-medium ">{row.index + 1}</p>;
+      const appointment = row.original;
+      const isCancelled = appointment.status === "cancelled";
+      return (
+        <p className={`text-14-medium ${isCancelled ? "line-through text-gray-500" : ""}`}>
+          {row.index + 1}
+        </p>
+      );
     },
   },
   {
@@ -22,7 +26,23 @@ export const columns: ColumnDef<Appointment>[] = [
     header: "Customer",
     cell: ({ row }) => {
       const appointment = row.original;
-      return <p className="text-14-medium ">{appointment.room_type}</p>;
+      const isCancelled = appointment.status === "cancelled";
+      return (
+        <div className="flex items-center gap-3">
+          {appointment.customer?.customerDetails?.customerImageUrl && (
+            <Image
+              src={appointment.customer.customerDetails.customerImageUrl}
+              alt="customer"
+              width={32}
+              height={32}
+              className={`size-8 rounded-full ${isCancelled ? "opacity-50" : ""}`}
+            />
+          )}
+          <p className={`text-14-medium ${isCancelled ? "line-through text-gray-500" : ""}`}>
+            {appointment.customer?.name || "N/A"}
+          </p>
+        </div>
+      );
     },
   },
   {
@@ -32,43 +52,57 @@ export const columns: ColumnDef<Appointment>[] = [
       const appointment = row.original;
       return (
         <div className="min-w-[115px]">
-          <StatusBadge status={appointment.purpose} />
+          <StatusBadge status={appointment.status as Status} />
         </div>
       );
     },
   },
   {
-    accessorKey: "schedule",
-    header: "Appointment",
+    accessorKey: "purpose",
+    header: "Purpose",
     cell: ({ row }) => {
       const appointment = row.original;
+      const isCancelled = appointment.status === "cancelled";
       return (
-        <p className="text-14-regular min-w-[100px]">
-          {formatDateTime(appointment.schedule).dateTime}
+        <p className={`text-14-regular ${isCancelled ? "line-through text-gray-500" : ""}`}>
+          {appointment.purpose}
         </p>
       );
     },
   },
   {
-    accessorKey: "room_type",
-    header: "Room",
+    accessorKey: "checkInDate",
+    header: "Check-In",
     cell: ({ row }) => {
       const appointment = row.original;
-
-      const room = roomTypes.find(
-        (room) => room === appointment.room_type,
+      const isCancelled = appointment.status === "cancelled";
+      return (
+        <p className={`text-14-regular min-w-[100px] ${isCancelled ? "line-through text-gray-500" : ""}`}>
+          {appointment.checkInDate
+            ? formatDateTime(appointment.checkInDate).dateTime
+            : "Not set"}
+        </p>
       );
-
+    },
+  },
+  {
+    accessorKey: "numberOfRooms",
+    header: "Rooms",
+    cell: ({ row }) => {
+      const appointment = row.original;
+      const isCancelled = appointment.status === "cancelled";
       return (
         <div className="flex items-center gap-3">
           <Image
             src="/assets/icons/room.svg"
             alt="room"
-            width={100}
-            height={100}
-            className="size-8"
+            width={32}
+            height={32}
+            className={`size-8 ${isCancelled ? "opacity-50" : ""}`}
           />
-          <p className="whitespace-nowrap">Room Type : {room}</p>
+          <p className={`whitespace-nowrap ${isCancelled ? "line-through text-gray-500" : ""}`}>
+            {appointment.numberOfRooms || "N/A"} Room(s)
+          </p>
         </div>
       );
     },
@@ -82,19 +116,18 @@ export const columns: ColumnDef<Appointment>[] = [
       return (
         <div className="flex gap-1">
           <AppointmentModal
-            userId={appointment.userId}
+            userId={appointment.customerId}
+            appointmentId={appointment.id}
             type="schedule"
-            title="Schedule Appointment"
-            description="Please confirm the following details to schedule."
           />
           <AppointmentModal
-            userId={appointment.userId}
+            userId={appointment.customerId}
+            appointmentId={appointment.id}
             type="cancel"
-            title="Cancel Appointment"
-            description="Are you sure you want to cancel your appointment?"
           />
         </div>
       );
     },
   },
 ];
+

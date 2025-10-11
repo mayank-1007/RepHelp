@@ -1,0 +1,74 @@
+// Neon Postgres Database Schema for RepHelp
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Customer {
+  id                    String   @id @default(uuid())
+  name                  String
+  email                 String   @unique
+  phone                 String   @unique
+  otp                   String?
+  otpVerified           Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  customerDetails       CustomerDetail?
+  appointments          Appointment[]
+}
+
+model CustomerDetail {
+  id                    String   @id @default(uuid())
+  customerId            String   @unique
+  customer              Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  // Personal Information
+  dateOfBirth           DateTime?
+  gender                String?
+  address               String?
+  state                 String?
+  district              String?
+  nationality           String?
+  
+  // Identification
+  identificationType    String?
+  identificationNumber  String?
+  identificationDocUrl  String?
+  
+  // Media
+  customerImageUrl      String?
+  signatureUrl          String?
+  
+  // Consent
+  treatmentConsent      Boolean  @default(false)
+  disclosureConsent     Boolean  @default(false)
+  privacyConsent        Boolean  @default(false)
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model Appointment {
+  id                    String   @id @default(uuid())
+  customerId            String
+  customer              Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  purpose               String
+  numberOfRooms         String?
+  checkInDate           DateTime?
+  checkOutDate          DateTime?
+  note                  String?
+  status                String   @default("pending") // pending, scheduled, cancelled
+  cancellationReason    String?
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@index([customerId])
+  @@index([status])
+}

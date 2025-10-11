@@ -5,6 +5,11 @@ import RegisterForm from "@/components/form/RegisterForm";
 import { getUser } from "@/lib/actions/customer.actions";
 const Register = async ({ params: { userId } }: SearchParamProps) => {
   const user = await getUser(userId);
+  
+  if (!user) {
+    return <div>User not found</div>;
+  }
+  
   return (
     <div className="flex">
       <section className="remove-scrollbar container">

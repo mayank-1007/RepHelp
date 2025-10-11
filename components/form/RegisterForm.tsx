@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import CustomFormField from "../CustomFormField";
 import SubmitButton from "@/components/SubmitButton";
+import { toast } from "sonner";
 import { UserFormValidation, CustomerFormValidation } from "@/lib/validation";
 import { useRouter } from "next/navigation";
 import { createUser, registerCustomer } from "@/lib/actions/customer.actions";
@@ -47,7 +48,6 @@ import { SelectItem } from "@radix-ui/react-select";
 import CapturePopover from "../CustomerImage";
 import { DocumentScanPopover } from "../DocumentImage";
 import Link from "next/link";
-import DocumentTypeSelector from "../DocumentImageScan";
 
 const getCurrentDate = (): Date => {
   return new Date();
@@ -111,10 +111,66 @@ export default function RegisterForm({ user }: { user: User }) {
     setIsLoading(true);
   
     try {
+      let identificationDocUrl = '';
+      let customerImageUrl = '';
+      let signatureUrl = selectedIdentificationType; // This is actually the signature from handleSave
+
+      // Upload identification document to Cloudinary if present
+      if (values.identificationDocument && values.identificationDocument.length > 0) {
+        toast.info("Uploading identification document...");
+        const formData = new FormData();
+        formData.append('file', values.identificationDocument[0]);
+        
+        const uploadResponse = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (uploadResponse.ok) {
+          const data = await uploadResponse.json();
+          identificationDocUrl = data.url;
+          console.log('ID Document uploaded:', identificationDocUrl);
+        } else {
+          toast.error("Failed to upload identification document");
+        }
+      }
+
+      // Upload customer image to Cloudinary if present
+      if (values.customer_image && values.customer_image.length > 0) {
+        toast.info("Uploading customer photo...");
+        const formData = new FormData();
+        formData.append('file', values.customer_image[0]);
+        
+        const uploadResponse = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (uploadResponse.ok) {
+          const data = await uploadResponse.json();
+          customerImageUrl = data.url;
+          console.log('Customer image uploaded:', customerImageUrl);
+        } else {
+          toast.error("Failed to upload customer photo");
+        }
+      }
+
       const customerData = {
-        ...values,
-        userId: user.$id,
-        birthDate: new Date(values.birthDate ? values.birthDate : getCurrentDate()),
+        customerId: user.id,
+        dateOfBirth: values.birthDate ? new Date(values.birthDate) : undefined,
+        gender: values.gender,
+        address: values.address,
+        state: values.state,
+        district: values.district,
+        nationality: values.nationality,
+        identificationType: values.identificationType,
+        identificationNumber: values.identificationNumber,
+        identificationDocUrl: identificationDocUrl || undefined,
+        customerImageUrl: customerImageUrl || undefined,
+        signatureUrl: signatureUrl || undefined,
+        treatmentConsent: values.treatmentConsent === true,
+        disclosureConsent: values.disclosureConsent === true,
+        privacyConsent: values.privacyConsent === true,
       };
       
       // Debugging statements
@@ -123,13 +179,15 @@ export default function RegisterForm({ user }: { user: User }) {
       const customer = await registerCustomer(customerData);
       
       console.log("Customer registered successfully:", customer);
+      toast.success("Registration completed successfully!");
       
       // Ensure router push is reached
       console.log("Navigating to the new booking route");
-      router.push(`/customer/${user.$id}/new-booking`);
+      router.push(`/customer/${user.id}/new-booking`);
       
     } catch (error) {
       console.log("An error occurred during form submission:", error);
+      toast.error("Failed to complete registration. Please try again.");
     } finally {
       // Ensure loading is disabled regardless of success or error
       setIsLoading(false);
@@ -362,28 +420,20 @@ export default function RegisterForm({ user }: { user: User }) {
             )}
           />
         </div>
-        <div className="flex-box">
+        <div className="flex flex-col gap-6 xl:flex-row">
           <CustomFormField
-            fieldType={FormFieldType.SKELETON}
+            fieldType={FormFieldType.INPUT}
             control={form.control}
-            name="coming_from"
-            label="Coming From"
-            renderSkeleton={(field) => (
-              <FormControl>
-                <NestedDropdown />
-              </FormControl>
-            )}
+            name="state"
+            label="State"
+            placeholder="Enter your state"
           />
           <CustomFormField
-            fieldType={FormFieldType.SKELETON}
+            fieldType={FormFieldType.INPUT}
             control={form.control}
-            name="going_to"
-            label="Going To"
-            renderSkeleton={(field) => (
-              <FormControl>
-                <NestedDropdown />
-              </FormControl>
-            )}
+            name="district"
+            label="District"
+            placeholder="Enter your district"
           />
         </div>
 
@@ -423,7 +473,7 @@ export default function RegisterForm({ user }: { user: User }) {
             label="Scanned Copy of Identification Document"
             renderSkeleton={(field) => (
               <FormControl>
-                <DocumentScanPopover onScanComplete={handleScanComplete} />
+                <FileUploader files={field.value} onChange={field.onChange} />
               </FormControl>
             )}
           />
@@ -435,7 +485,7 @@ export default function RegisterForm({ user }: { user: User }) {
             label="Customer Image"
             renderSkeleton={(field) => (
               <FormControl>
-                <CapturePopover />
+                <FileUploader files={field.value} onChange={field.onChange} />
               </FormControl>
             )}
           />

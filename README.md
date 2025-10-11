@@ -85,7 +85,6 @@ This project is built with a modern and robust technology stack:
 | **API & Server**      | [**Next.js API Routes**](https://nextjs.org/docs/pages/building-your-application/routing/api-routes), [**Node.js**](https://nodejs.org/) |
 | **Communication**     | [**Twilio**](https://www.twilio.com/) (SMS/OTP), [**Nodemailer**](https://nodemailer.com/) (Email)       |
 | **OCR**               | [**Tesseract.js**](https://tesseract.projectnaptha.com/)                                                 |
-| **Error Monitoring**  | [**Sentry**](https://sentry.io/)                                                                         |
 | **Deployment**        | [**Vercel**](https://vercel.com/)                                                                        |
 
 ---
