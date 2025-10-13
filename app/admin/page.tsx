@@ -16,38 +16,38 @@ const AdminPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // Check authentication
-    const checkAuth = () => {
-      if (typeof window !== "undefined") {
-        const sessionAuth = sessionStorage.getItem("adminAuthenticated");
-        console.log("Session Auth:", sessionAuth === "true");
-        setIsAuthenticated(sessionAuth === "true");
-      }
-      setIsLoading(false);
-    };
+  // useEffect(() => {
+  //   // Check authentication
+  //   const checkAuth = () => {
+  //     if (typeof window !== "undefined") {
+  //       const sessionAuth = sessionStorage.getItem("adminAuthenticated");
+  //       console.log("Session Auth:", sessionAuth === "true");
+  //       setIsAuthenticated(sessionAuth === "true");
+  //     }
+  //     setIsLoading(false);
+  //   };
 
-    checkAuth();
+  //   checkAuth();
 
-    // Listen for authentication changes
-    const interval = setInterval(() => {
-      if (typeof window !== "undefined") {
-        const sessionAuth = sessionStorage.getItem("adminAuthenticated");
-        const newAuthState = sessionAuth === "true";
+  //   // Listen for authentication changes
+  //   const interval = setInterval(() => {
+  //     if (typeof window !== "undefined") {
+  //       const sessionAuth = sessionStorage.getItem("adminAuthenticated");
+  //       const newAuthState = sessionAuth === "true";
         
-        if (newAuthState !== isAuthenticated) {
-          setIsAuthenticated(newAuthState);
+  //       if (newAuthState !== isAuthenticated) {
+  //         setIsAuthenticated(newAuthState);
           
-          // Load appointments when authenticated
-          if (newAuthState) {
-            loadAppointments();
-          }
-        }
-      }
-    }, 500);
+  //         // Load appointments when authenticated
+  //         if (newAuthState) {
+  //           loadAppointments();
+  //         }
+  //       }
+  //     }
+  //   }, 500);
 
-    return () => clearInterval(interval);
-  }, [isAuthenticated]);
+  //   return () => clearInterval(interval);
+  // }, [isAuthenticated]);
 
   const loadAppointments = async () => {
     const data = await getRecentAppointmentList();

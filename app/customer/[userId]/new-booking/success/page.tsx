@@ -71,7 +71,7 @@ const RequestSuccess = async ({
           <Link href={`/customer/${userId}/new-booking`}>New Booking</Link>
         </Button>
 
-        <p className="copyright">© 2024 Rephelp</p>
+        <p className="copyright">© <span>{new Date().getFullYear()}</span> RepHelp</p>
       </div>
     </div>
   );

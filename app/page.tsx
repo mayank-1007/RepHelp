@@ -24,7 +24,7 @@ export default function Home({ searchParams }: SearchParamProps) {
 
           <div className="text-14-regular mt-20 flex justify-between ">
             <p className="justify-items-end text-dark-500 xl:text-left">
-              ©️ 2024 RepHelp
+              ©️ <span>{new Date().getFullYear()}</span> RepHelp
             </p>
             <Link href="/admin" className="text-green-500">
               Admin
