@@ -57,7 +57,7 @@ export const PasskeyModal = () => {
   const closeModal = () => {
     // Only redirect if user explicitly clicks close button
     toast.info("Authentication required to access admin panel");
-    router.push("/");
+    router.push("/admin");
   };
 
   const handleOpenChange = (newOpen: boolean) => {
