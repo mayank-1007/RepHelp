@@ -15,7 +15,7 @@ export const LogoutButton = () => {
     // Redirect to home page
     if(typeof window !== "undefined") {
       setTimeout(() => {
-        router.push("/admin");
+        router.push("/");
       }, 500);
     }
   };
