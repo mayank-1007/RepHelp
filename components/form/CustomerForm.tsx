@@ -156,7 +156,11 @@ export default function CustomerForm() {
             Open
           </Button>
         </DialogTrigger>
-        <DialogContent className="shad-dialog sm:max-w-md">
+        <DialogContent
+          className="shad-dialog sm:max-w-md"
+          onEscapeKeyDown={(e: any) => e.preventDefault()}
+          onPointerDownOutside={(e: any) => e.preventDefault()}
+        >
           <DialogHeader className="mb-4 space-y-3">
             <DialogTitle className="text-center text-2xl font-bold">Verify Your Identity</DialogTitle>
             <DialogDescription className="text-center">
