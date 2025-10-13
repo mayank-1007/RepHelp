@@ -8,7 +8,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Image from "next/image";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -36,13 +36,25 @@ export function DataTable<TData, TValue>({
       ? window.localStorage.getItem("accessKey")
       : null;
 
+  const router = useRouter();
+
   useEffect(() => {
+    // Prefer session-based admin auth (set by Passkey modal).
+    if (typeof window === "undefined") return;
+
+    const sessionAuth = sessionStorage.getItem("adminAuthenticated");
+    if (sessionAuth === "true") {
+      // already authenticated for this session
+      return;
+    }
+
     const accessKey = encryptedKey && decryptKey(encryptedKey);
 
-    if (accessKey !== process.env.NEXT_PUBLIC_ADMIN_PASSKEY!.toString()) {
-      redirect("/");
+    // If accessKey doesn't match or not present, redirect client-side
+    if (accessKey !== process.env.NEXT_PUBLIC_ADMIN_PASSKEY?.toString()) {
+      router.push("/");
     }
-  }, [encryptedKey]);
+  }, [encryptedKey, router]);
 
   const table = useReactTable({
     data,

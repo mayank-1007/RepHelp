@@ -9,13 +9,15 @@ export const LogoutButton = () => {
 
   const handleLogout = () => {
     // Clear session authentication
-    sessionStorage.removeItem("adminAuthenticated");
+    sessionStorage.setItem("adminAuthenticated", "false");
     toast.success("Logged out successfully");
     
     // Redirect to home page
-    setTimeout(() => {
-      router.push("/");
-    }, 500);
+    if(typeof window !== "undefined") {
+      setTimeout(() => {
+        router.push("/admin");
+      }, 500);
+    }
   };
 
   return (
