@@ -63,6 +63,7 @@ export const PasskeyModal = () => {
   const handleOpenChange = (newOpen: boolean) => {
     // Prevent closing the modal by ignoring the state change
     // User can only close via the X button which calls closeModal
+    router.push("/admin");
     return;
   };
 
