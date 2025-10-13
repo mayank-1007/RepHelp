@@ -40,6 +40,7 @@ export const PasskeyModal = () => {
       // Check if user is authenticated in this session
       if (typeof window !== "undefined") {
         const sessionAuth = sessionStorage.getItem("adminAuthenticated");
+        // console.log("Session Auth:", sessionAuth);
         
         if (sessionAuth === "true") {
           setIsAuthenticated(true);
@@ -57,13 +58,12 @@ export const PasskeyModal = () => {
   const closeModal = () => {
     // Only redirect if user explicitly clicks close button
     toast.info("Authentication required to access admin panel");
-    router.push("/admin");
+    router.push("/");
   };
 
   const handleOpenChange = (newOpen: boolean) => {
     // Prevent closing the modal by ignoring the state change
     // User can only close via the X button which calls closeModal
-    router.push("/admin");
     return;
   };
 
@@ -88,9 +88,11 @@ export const PasskeyModal = () => {
       if (passkey === adminPasskey) {
         // Use sessionStorage instead of localStorage
         // This will require re-authentication when browser/tab is closed
-        if (typeof window !== "undefined") {
+        // if (typeof window !== "undefined") {
           sessionStorage.setItem("adminAuthenticated", "true");
-        }
+        // }
+        // console.log("Passkey correct, sessionStorage set");
+        // console.log("Session Auth after setting:", sessionStorage.getItem("adminAuthenticated"));
         
         toast.success("Access granted! Welcome Admin 👋");
         setIsAuthenticated(true);

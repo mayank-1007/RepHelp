@@ -6,7 +6,7 @@ import Image from "next/image";
 import { formatDateTime } from "@/lib/utils";
 import { AppointmentModal } from "../AppointmentModal";
 import { StatusBadge } from "../StatusBadge";
-import { Appointment } from "@/types/appwrite.types";
+import { Appointment } from "@/types/prisma.types";
 
 export const columns: ColumnDef<Appointment>[] = [
   {

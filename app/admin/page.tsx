@@ -21,6 +21,7 @@ const AdminPage = () => {
     const checkAuth = () => {
       if (typeof window !== "undefined") {
         const sessionAuth = sessionStorage.getItem("adminAuthenticated");
+        console.log("Session Auth:", sessionAuth === "true");
         setIsAuthenticated(sessionAuth === "true");
       }
       setIsLoading(false);
