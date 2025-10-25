@@ -54,7 +54,7 @@ RepHelp is a comprehensive solution designed to streamline hotel reception manag
 ---
 
 ## 🚀 Live Demo & Screenshots
-  [**View Live Demo**](https://rephelp.netlify.app) 
+  [**View Live Demo**](https://rephelp1.vercel.app) 
 -
 
 ### Live Demo
@@ -109,7 +109,7 @@ This project is built with a modern and robust technology stack:
 | **Form Management**   | [**React Hook Form**](https://react-hook-form.com/), [**Zod**](https://zod.dev/)                     |
 | **Notifications**     | [**Sonner**](https://sonner.emilkowal.ski/) (Toast Notifications)                                    |
 | **Email Service**     | [**Nodemailer**](https://nodemailer.com/) (Gmail SMTP for OTP)                                        |
-| **Deployment**        | [**Vercel**](https://vercel.com/) / [**Netlify**](https://www.netlify.com/)                          |
+| **Deployment**        | [**Vercel**](https://vercel.com/)                                                                     |
 
 ---
 
@@ -180,7 +180,7 @@ Make sure you have the following installed on your machine:
 
 ## 🚀 Deployment
 
-The application can be deployed using Vercel or Netlify.
+The application can be deployed using Vercel.
 
 ### Deploy to Vercel (Recommended)
 
@@ -189,7 +189,7 @@ The application can be deployed using Vercel or Netlify.
 3. Add all environment variables from `.env.local`
 4. Deploy!
 
-Deployment Link - https://rephelp.netlify.app
+Deployment Link - https://rephelp1.vercel.app
 
 ---
 
