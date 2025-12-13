@@ -2,6 +2,13 @@ export const GenderOptions = ["Male", "Female", "Other"];
 
 export const PurposeOptions = ["Offical", "Personal"];
 
+// Demo credentials for recruiters/testers. Using these skips OTP verification.
+export const TEST_CREDENTIALS = {
+  name: "Demo User",
+  email: "demo@rephelp.app",
+  phone: "+911234567890",
+};
+
 export const NumberOfRooms = [
   "1",
   "2",
