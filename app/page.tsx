@@ -2,13 +2,10 @@ import CustomerForm from "@/components/form/CustomerForm";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { PasskeyModal } from "@/components/PasskeyModal";
 
 export default function Home({ searchParams }: SearchParamProps) {
-  const isAdmin = searchParams?.admin === "true";
   return (
     <div className="flex h-screen max-h-screen">
-      {isAdmin && <PasskeyModal />}
       <section className="remove-scrollbar container my-auto">
         <div className="flex logo-wrapper img-text-wrapper sub-container max-w-[496px]">
           <div className="flex items-center">
@@ -27,9 +24,9 @@ export default function Home({ searchParams }: SearchParamProps) {
 
           <div className="text-14-regular mt-20 flex justify-between ">
             <p className="justify-items-end text-dark-500 xl:text-left">
-              ©️ 2024 RepHelp
+              ©️ <span>{new Date().getFullYear()}</span> RepHelp
             </p>
-            <Link href="/?admin=true" className="text-green-500">
+            <Link href="/admin" className="text-green-500">
               Admin
             </Link>
           </div>

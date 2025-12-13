@@ -14,46 +14,67 @@ declare interface CreateUserParams {
   phone: string;
 }
 declare interface User extends CreateUserParams {
-  $id: string;
+  id: string;
 }
 
-declare interface RegisterUserParams extends CreateUserParams {
-  userId: string | undefined;
-  name?: string | undefined;
-  email?: string | undefined; 
-  phone?: string | undefined;
-  birthDate?: Date | undefined;
-  number_of_rooms?: string | undefined;
-  // coming_from: string | undefined;
-  // going_to: string | undefined;
-  gender?: Gender | undefined;
-  address?: string | undefined;
-  nationality?: string | undefined | "";
-  vehicle_no?: string | "" | undefined;
-  purpose?: string | "" | undefined;
-  occupation?: string | undefined;
-  emergencyContactName?: string | undefined;
-  emergencyContactNumber?: string | undefined;
-  customer_image?: formData | undefined;
-  check_in?: Date | undefined;
-  check_out?: Date | undefined;
-  identificationType?: string | "" | undefined;
-  identificationNumber?: string | "" | undefined;
-  identificationDocument?: customerformData | undefined;
-  privacyConsent?: boolean | undefined;
+declare interface RegisterUserParams {
+  customerId: string;
+  // Prisma CustomerDetail fields
+  dateOfBirth?: Date;
+  birthDate?: Date; // Alias for dateOfBirth
+  gender?: Gender;
+  address?: string;
+  state?: string;
+  district?: string;
+  nationality?: string;
+  identificationType?: string;
+  identificationNumber?: string;
+  identificationDocUrl?: string;
+  customerImageUrl?: string;
+  signatureUrl?: string;
+  treatmentConsent?: boolean;
+  disclosureConsent?: boolean;
+  privacyConsent?: boolean;
+  
+  // Additional form fields (not stored in CustomerDetail, ignored by registerCustomer)
+  name?: string;
+  email?: string;
+  phone?: string;
+  room_no?: string;
+  number_of_rooms?: string;
+  check_in?: Date;
+  check_out?: Date;
+  vehicle_no?: string;
+  purpose?: string;
+  occupation?: string;
+  emergencyContactName?: string;
+  emergencyContactNumber?: string;
+  insuranceProvider?: string;
+  insurancePolicyNumber?: string;
+  customer_image?: File[];
+  identificationDocument?: File[];
+  signature?: string;
 }
 
 declare type CreateAppointmentParams = {
-  // userId: string;
-  purpose: string | "";
-  schedule: Date;
-  room_type: string;
-  note: string | "";
+  customerId: string;
+  purpose: string;
+  numberOfRooms?: string;
+  checkInDate?: string;
+  checkOutDate?: string;
+  note?: string;
+  status?: string;
 };
 
 declare type UpdateAppointmentParams = {
   appointmentId: string;
-  userId: string;
-  appointment: Appointment;
-  type: string;
+  appointment: {
+    status?: string;
+    checkInDate?: string;
+    checkOutDate?: string;
+    note?: string;
+    cancellationReason?: string;
+    numberOfRooms?: string;
+    purpose?: string;
+  };
 };

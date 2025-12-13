@@ -27,7 +27,7 @@ const Appointment = async ({ params: { userId } }: SearchParamProps) => {
             userId={userId}
           />
 
-          <p className="copyright mt-10 py-12">© 2024 Rephelp</p>
+          <p className="copyright mt-10 py-12">© <span>{new Date().getFullYear()}</span> RepHelp</p>
         </div>
       </section>
 

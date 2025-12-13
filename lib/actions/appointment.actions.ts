@@ -1,143 +1,156 @@
 "use server";
 
+import { prisma } from "../db";
 import { revalidatePath } from "next/cache";
-import { ID, Query } from "node-appwrite";
 
-import { Appointment } from "@/types/appwrite.types";
-
-import {
-  BOOKING_COLLECTION_ID,
-  DATABASE_ID,
-  databases,
-  messaging,
-} from "../appwrite.config";
-import { formatDateTime, parseStringify } from "../utils";
-
-//  CREATE APPOINTMENT
-export const createAppointment = async (
-  appointment: CreateAppointmentParams,
-) => {
+export const createAppointment = async (appointment: CreateAppointmentParams) => {
   try {
-    const newAppointment = await databases.createDocument(
-      DATABASE_ID!,
-      BOOKING_COLLECTION_ID!,
-      ID.unique(),
-      appointment,
-    );
+    const checkInDate = appointment.checkInDate ? new Date(appointment.checkInDate) : new Date();
+    const now = new Date();
+    
+    // Determine initial status based on check-in time
+    let initialStatus = "pending";
+    if (checkInDate <= now) {
+      // If check-in is now or in the past, mark as scheduled
+      initialStatus = "scheduled";
+    }
+    
+    const newAppointment = await prisma.appointment.create({
+      data: {
+        customerId: appointment.customerId,
+        purpose: appointment.purpose,
+        numberOfRooms: appointment.numberOfRooms || null,
+        checkInDate: checkInDate,
+        checkOutDate: appointment.checkOutDate ? new Date(appointment.checkOutDate) : null,
+        note: appointment.note || null,
+        status: initialStatus,
+      },
+    });
 
     revalidatePath("/admin");
-    return parseStringify(newAppointment);
+    return newAppointment;
   } catch (error) {
-    console.error("An error occurred while creating a new appointment:", error);
+    console.error("Error creating appointment:", error);
+    throw error;
   }
 };
 
-//  GET RECENT APPOINTMENTS
+export const getAppointment = async (appointmentId: string) => {
+  try {
+    const appointment = await prisma.appointment.findUnique({
+      where: { id: appointmentId },
+      include: {
+        customer: {
+          include: {
+            customerDetails: true,
+          },
+        },
+      },
+    });
+
+    return appointment;
+  } catch (error) {
+    console.error("Error retrieving appointment:", error);
+    return null;
+  }
+};
+
 export const getRecentAppointmentList = async () => {
   try {
-    const appointments = await databases.listDocuments(
-      DATABASE_ID!,
-      BOOKING_COLLECTION_ID!,
-      [Query.orderDesc("$createdAt")],
-    );
+    const appointments = await prisma.appointment.findMany({
+      include: {
+        customer: {
+          include: {
+            customerDetails: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
-    const initialCounts = {
+    const counts = {
+      scheduledCount: appointments.filter((apt: any) => apt.status === "scheduled").length,
+      pendingCount: appointments.filter((apt: any) => apt.status === "pending").length,
+      cancelledCount: appointments.filter((apt: any) => apt.status === "cancelled").length,
+    };
+
+    return {
+      totalCount: appointments.length,
+      ...counts,
+      documents: appointments,
+    };
+  } catch (error) {
+    console.error("Error retrieving appointments:", error);
+    return {
+      totalCount: 0,
       scheduledCount: 0,
       pendingCount: 0,
       cancelledCount: 0,
+      documents: [],
     };
-
-    const counts = (appointments.documents as Appointment[]).reduce(
-      (acc, appointment) => {
-        switch (appointment.status) {
-          case "scheduled":
-            acc.scheduledCount++;
-            break;
-          case "pending":
-            acc.pendingCount++;
-            break;
-          case "cancelled":
-            acc.cancelledCount++;
-            break;
-        }
-        return acc;
-      },
-      initialCounts,
-    );
-
-    const data = {
-      totalCount: appointments.total,
-      ...counts,
-      documents: appointments.documents,
-    };
-
-    return parseStringify(data);
-  } catch (error) {
-    console.error(
-      "An error occurred while retrieving the recent appointments:",
-      error,
-    );
   }
 };
 
-//  SEND SMS NOTIFICATION
-export const sendSMSNotification = async (userId: string, content: string) => {
-  try {
-    // https://appwrite.io/docs/references/1.5.x/server-nodejs/messaging#createSms
-    const message = await messaging.createSms(
-      ID.unique(),
-      content,
-      [],
-      [userId],
-    );
-    return parseStringify(message);
-  } catch (error) {
-    console.error("An error occurred while sending sms:", error);
-  }
-};
-
-//  UPDATE APPOINTMENT
 export const updateAppointment = async ({
   appointmentId,
-  userId,
   appointment,
-  type,
 }: UpdateAppointmentParams) => {
   try {
-    // Update appointment to scheduled -> https://appwrite.io/docs/references/cloud/server-nodejs/databases#updateDocument
-    const updatedAppointment = await databases.updateDocument(
-      DATABASE_ID!,
-      BOOKING_COLLECTION_ID!,
-      appointmentId,
-      appointment,
-    );
+    // Prepare update data
+    const updateData: any = {};
 
-    if (!updatedAppointment) throw Error;
+    // If status is being updated
+    if (appointment.status) {
+      updateData.status = appointment.status;
+    }
 
-    const smsMessage = `Greetings from CarePulse.`;
-    await sendSMSNotification(userId, smsMessage);
+    // If cancelling, save cancellationReason
+    if (appointment.status === "cancelled" && appointment.cancellationReason) {
+      updateData.cancellationReason = appointment.cancellationReason;
+    }
+
+    // If rescheduling, update dates and check smart status logic
+    if (appointment.checkInDate && appointment.checkOutDate) {
+      const checkInDate = new Date(appointment.checkInDate);
+      const now = new Date();
+      
+      updateData.checkInDate = checkInDate;
+      updateData.checkOutDate = new Date(appointment.checkOutDate);
+      
+      // Smart status logic for rescheduling
+      if (checkInDate <= now) {
+        updateData.status = "scheduled";
+      } else {
+        updateData.status = "pending";
+      }
+    }
+
+    // Update note if provided
+    if (appointment.note) {
+      updateData.note = appointment.note;
+    }
+
+    // Update numberOfRooms if provided
+    if (appointment.numberOfRooms) {
+      updateData.numberOfRooms = appointment.numberOfRooms.toString();
+    }
+
+    // Update purpose if provided
+    if (appointment.purpose) {
+      updateData.purpose = appointment.purpose;
+    }
+
+    const updatedAppointment = await prisma.appointment.update({
+      where: { id: appointmentId },
+      data: updateData,
+    });
 
     revalidatePath("/admin");
-    return parseStringify(updatedAppointment);
+    return updatedAppointment;
   } catch (error) {
-    console.error("An error occurred while scheduling an appointment:", error);
-  }
-};
-
-// GET APPOINTMENT
-export const getAppointment = async (appointmentId: string) => {
-  try {
-    const appointment = await databases.getDocument(
-      DATABASE_ID!,
-      BOOKING_COLLECTION_ID!,
-      appointmentId,
-    );
-
-    return parseStringify(appointment);
-  } catch (error) {
-    console.error(
-      "An error occurred while retrieving the existing room:",
-      error,
-    );
+    console.error("Error updating appointment:", error);
+    throw error;
   }
 };

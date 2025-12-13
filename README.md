@@ -1,5 +1,5 @@
 
-# RepHelp - hotel Management System
+# RepHelp - Hotel Management System
 
 <div align="center">
   <img src="./public/assets/icons/Logo.svg" alt="RepHelp Logo" width="100" />
@@ -8,7 +8,7 @@
 
 <div align="center">
 
-A modern, full-stack hotel management and appointment scheduling application built with Next.js, Appwrite, and TypeScript.
+A modern, full-stack hotel management and room booking system built with Next.js, Neon PostgreSQL, Prisma, and TypeScript.
 
 </div>
 
@@ -16,53 +16,77 @@ A modern, full-stack hotel management and appointment scheduling application bui
 
 ## 📖 About The Project
 
-RepHelp is a comprehensive solution designed to streamline hotel administration and appointment booking for rooms facilities. It offers a user-friendly interface for hotels to register and book appointments, and a secure, feature-rich dashboard for administrators to manage the system efficiently. The project leverages modern web technologies to provide a seamless, secure, and responsive experience.
+RepHelp is a comprehensive solution designed to streamline hotel reception management and room booking. It offers an intuitive interface for customers to register and book rooms, complete with OTP verification, file uploads, and a secure admin dashboard for managing bookings efficiently. The project leverages modern web technologies to provide a seamless, secure, and responsive experience.
 
 ---
 
 ### ✨ Key Features
 
-*   **📝 hotel Registration:** A multi-step, user-friendly form for new hotels to enter their personal and medical information.
-*   **🗓️ Appointment Scheduling:** An intuitive system for hotels to digitally book rooms.
-*   **🔐 Secure Admin Dashboard:** A passkey-protected portal for administrators to manage hotel data, appointments, and system settings.
-*   **👁️ Document OCR Scanning:** Integrated Tesseract.js to scan documents like ID cards and extract information automatically, reducing manual data entry.
-*   **📱 OTP Verification:** Twilio integration for verifying hotel phone numbers, enhancing security and data integrity.
-*   **📊 Status Dashboards:** Visual dashboards for tracking appointment statuses (Scheduled, Pending, Cancelled).
-*   **📧 Email Notifications:** Automated email confirmations and reminders for appointments using Nodemailer.
-*   **🎨 Responsive Design:** Fully responsive UI built with Tailwind CSS and Shadcn/ui, ensuring a great experience on any device.
+#### 🔐 **Security & Authentication**
+*   **OTP Verification:** Email-based OTP verification with elegant 6-digit input UI for customer authentication
+*   **Session-Based Admin Access:** Secure admin dashboard with passkey protection and session management
+*   **File Upload Security:** Cloudinary integration for secure document and image storage
+
+#### 📝 **Customer Experience**
+*   **Multi-Step Registration:** User-friendly registration flow with form validation
+*   **Smart Booking System:** Intelligent appointment scheduling with automatic status management
+*   **Real-time Notifications:** Toast notifications for all user actions (success, error, loading states)
+*   **Document Upload:** Secure upload for ID documents, customer photos, and digital signatures
+
+#### 🎯 **Smart Appointment Management**
+*   **Time-Based Status Logic:** Appointments automatically marked as "scheduled" or "pending" based on check-in date
+*   **Rescheduling:** Complete rescheduling functionality with pre-filled data and smart status updates
+*   **Cancellation Workflow:** Soft-delete system with cancellation reasons (appointments marked, not deleted)
+*   **Visual Indicators:** Strikethrough styling for cancelled appointments in admin view
+
+#### 👨‍💼 **Admin Dashboard**
+*   **Comprehensive Overview:** Track scheduled, pending, and cancelled bookings with stat cards
+*   **Interactive Data Table:** Manage all bookings with inline actions (reschedule/cancel)
+*   **Secure Access:** Session-based authentication with automatic timeout on browser close
+*   **Logout Functionality:** Clean session management with logout button
+
+#### 💅 **Modern UI/UX**
+*   **Loading States:** Proper spinners and loading indicators throughout the application
+*   **Toast Notifications:** Real-time feedback using Sonner for all operations
+*   **Responsive Design:** Fully responsive UI built with Tailwind CSS and Shadcn/ui
+*   **Form Validation:** Comprehensive validation using Zod and React Hook Form
 
 ---
 
 ## 🚀 Live Demo & Screenshots
-  [**View Live Demo**](https://rephelp.netlify.app) 
+  [**View Live Demo**](https://rephelp1.vercel.app) 
 -
 
 ### Live Demo
-*The whole booking flow of my webApp.*
+*The complete booking flow of RepHelp.*
 
 ![Live Demo video](public/assets/gifs/liveDemo.gif)
 
 
-### 🏠 Home & Registration Page
+### 🏠 Home & OTP Verification
 
-*A glimpse of the hotel registration flow.*
+*Customer registration with OTP verification flow.*
 
 ![RepHelp Home Page](public/assets/DemoImages/Home.png)
 <br/>
 
-![RepHelp Home Page](public/assets/DemoImages/Register.png)
+### 📝 Registration Page
+
+*Complete customer registration with file uploads.*
+
+![RepHelp Registration](public/assets/DemoImages/Register.png)
 <br/>
 
 ### 🔒 Admin Dashboard
 
-*The central hub for managing hotels and appointments.*
+*Secure admin portal with comprehensive booking management.*
 
 ![RepHelp Admin Dashboard](public/assets/DemoImages/Admin.png)
 <br/>
 
-### 📅 New Appointment Booking
+### 📅 Appointment Booking
 
-*The simple process for scheduling a new appointment.*
+*Simple and intuitive room booking interface.*
 
 ![RepHelp Appointment Booking](public/assets/DemoImages/Booking.png)
 <br/>
@@ -79,14 +103,13 @@ This project is built with a modern and robust technology stack:
 | Category              | Technology                                                                                             |
 | --------------------- | ------------------------------------------------------------------------------------------------------ |
 | **Frontend**          | [**Next.js 14**](https://nextjs.org/), [**React 18**](https://react.dev/), [**TypeScript**](https://www.typescriptlang.org/) |
-| **Backend & Database**| [**Appwrite**](https://appwrite.io/) (Cloud)                                                           |
-| **Styling**           | [**Tailwind CSS**](https://tailwindcss.com/), [**Shadcn/ui**](https://ui.shadcn.com/)                     |
-| **Form Management**   | [**React Hook Form**](https://react-hook-form.com/), [**Zod**](https://zod.dev/)                         |
-| **API & Server**      | [**Next.js API Routes**](https://nextjs.org/docs/pages/building-your-application/routing/api-routes), [**Node.js**](https://nodejs.org/) |
-| **Communication**     | [**Twilio**](https://www.twilio.com/) (SMS/OTP), [**Nodemailer**](https://nodemailer.com/) (Email)       |
-| **OCR**               | [**Tesseract.js**](https://tesseract.projectnaptha.com/)                                                 |
-| **Error Monitoring**  | [**Sentry**](https://sentry.io/)                                                                         |
-| **Deployment**        | [**Vercel**](https://vercel.com/)                                                                        |
+| **Backend & Database**| [**Neon PostgreSQL**](https://neon.tech/) (Serverless), [**Prisma ORM**](https://www.prisma.io/)      |
+| **File Storage**      | [**Cloudinary**](https://cloudinary.com/) (CDN & Image Optimization)                                  |
+| **Styling**           | [**Tailwind CSS**](https://tailwindcss.com/), [**Shadcn/ui**](https://ui.shadcn.com/)                |
+| **Form Management**   | [**React Hook Form**](https://react-hook-form.com/), [**Zod**](https://zod.dev/)                     |
+| **Notifications**     | [**Sonner**](https://sonner.emilkowal.ski/) (Toast Notifications)                                    |
+| **Email Service**     | [**Nodemailer**](https://nodemailer.com/) (Gmail SMTP for OTP)                                        |
+| **Deployment**        | [**Vercel**](https://vercel.com/)                                                                     |
 
 ---
 
@@ -114,75 +137,175 @@ Make sure you have the following installed on your machine:
     ```
 
 3.  **Set up environment variables:**
-    Create a `.env.local` file in the root of your project and add the following environment variables. You will need to create accounts and get credentials from the respective services.
+    Create a `.env.local` file in the root of your project and add the following environment variables:
 
     ```env
-    # Appwrite Configuration
-    NEXT_PUBLIC_APPWRITE_PROJECT_ID=your_appwrite_project_id
-    NEXT_PUBLIC_APPWRITE_API_KEY=your_appwrite_api_key
-    NEXT_PUBLIC_DATABASE_ID=your_appwrite_database_id
-    NEXT_PUBLIC_hotel_COLLECTION_ID=your_hotel_collection_id
-    NEXT_PUBLIC_APPOINTMENT_COLLECTION_ID=your_appointment_collection_id
-    NEXT_PUBLIC_BUCKET_ID=your_appwrite_storage_bucket_id
-    NEXT_PUBLIC_ENDPOINT=https://cloud.appwrite.io/v1
+    # Neon PostgreSQL Database
+    DATABASE_URL="postgresql://[user]:[password]@[host]/[database]?sslmode=require"
 
-    # Twilio Configuration
-    TWILIO_ACCOUNT_SID=your_twilio_account_sid
-    TWILIO_AUTH_TOKEN=your_twilio_auth_token
-    TWILIO_PHONE_NUMBER=your_twilio_phone_number
+    # Cloudinary Configuration (for file uploads)
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
+    CLOUDINARY_CLOUD_NAME=your_cloud_name
+    CLOUDINARY_API_KEY=your_api_key
+    CLOUDINARY_API_SECRET=your_api_secret
 
-    # Nodemailer Configuration (using Gmail as an example)
-    NODEMAILER_EMAIL=your_email@gmail.com
-    NODEMAILER_PW=your_gmail_app_password
+    # Email Configuration (Nodemailer with Gmail)
+    EMAIL_USER=your_email@gmail.com
+    EMAIL_PASS=your_gmail_app_password
 
-    # Admin Passkey
-    # This is a simple secret to access the admin modal. 
-    # In a real-world scenario, use a more robust authentication mechanism.
-    ADMIN_PASSKEY=your_secret_admin_passkey
+    # Admin Access (6-digit passkey)
+    NEXT_PUBLIC_ADMIN_PASSKEY=111111
     ```
 
-4.  **Run the development server:**
+    **How to get credentials:**
+    - **Neon Database:** Sign up at [neon.tech](https://neon.tech), create a project, and copy the connection string
+    - **Cloudinary:** Sign up at [cloudinary.com](https://cloudinary.com), get your cloud name, API key, and secret from the dashboard
+    - **Gmail App Password:** Enable 2FA on your Gmail account, then generate an app-specific password from [Google Account Settings](https://myaccount.google.com/apppasswords)
+
+4.  **Set up the database:**
+    ```sh
+    npx prisma db push
+    npx prisma generate
+    ```
+
+5.  **Run the development server:**
     ```sh
     npm run dev
     ```
 
-5.  **Open the application:**
+6.  **Open the application:**
     Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
 ---
 
 ## 🚀 Deployment
 
-The application is deployed using Netlify.
+The application can be deployed using Vercel.
 
-Deployment Link - https://rephelp.netlify.app
+### Deploy to Vercel (Recommended)
+
+1. Push your code to GitHub
+2. Import your repository on [Vercel](https://vercel.com)
+3. Add all environment variables from `.env.local`
+4. Deploy!
+
+Deployment Link - https://rephelp1.vercel.app
 
 ---
 
 ## 📂 Project Structure
 
-The project follows a standard Next.js `app` directory structure:
+The project follows a standard Next.js `app` directory structure with Prisma ORM:
 
 ```
 /
-├── app/                # Main application routes and UI
-│   ├── (pages)/        # Route groups
-│   │   ├── admin/
-│   │   └── customer/
-│   ├── api/            # API routes (OCR, OTP)
-│   ├── layout.tsx      # Root layout
-│   └── page.tsx        # Home page
-├── components/         # Reusable React components
-│   ├── forms/          # Form components (Register, Appointment)
-│   ├── table/          # Reusable data table
-│   └── ui/             # UI elements from Shadcn
-├── constants/          # Application constants
-├── lib/                # Core logic, utilities, and actions
-│   ├── actions/        # Server actions for data fetching/mutation
-│   └── config/         # Configuration files (e.g., Appwrite)
-├── public/             # Static assets (images, icons)
-└── types/              # TypeScript type definitions
+├── app/                      # Main application routes and UI
+│   ├── admin/                # Admin dashboard page
+│   ├── customer/             # Customer-facing pages
+│   │   └── [userId]/         # Dynamic routes for users
+│   │       ├── register/     # Registration page
+│   │       └── new-booking/  # Booking pages
+│   ├── api/                  # API routes
+│   │   ├── upload/           # Cloudinary file upload
+│   │   ├── send-otp/         # OTP generation
+│   │   └── verify-otp/       # OTP verification
+│   ├── layout.tsx            # Root layout with Toaster
+│   ├── loading.tsx           # Global loading component
+│   └── page.tsx              # Home page with customer form
+├── components/               # Reusable React components
+│   ├── form/                 # Form components
+│   │   ├── CustomerForm.tsx  # OTP login form
+│   │   ├── RegisterForm.tsx  # Full registration
+│   │   └── AppointmentForm.tsx # Booking form
+│   ├── table/                # Data table components
+│   │   ├── columns.tsx       # Table column definitions
+│   │   └── DataTable.tsx     # Reusable table
+│   ├── ui/                   # Shadcn UI components
+│   ├── AppointmentModal.tsx  # Cancel/reschedule modal
+│   ├── PasskeyModal.tsx      # Admin authentication
+│   ├── LogoutButton.tsx      # Admin logout
+│   └── StatCard.tsx          # Dashboard statistics
+├── lib/                      # Core logic and utilities
+│   ├── actions/              # Server actions
+│   │   ├── customer.actions.ts    # Customer CRUD
+│   │   └── appointment.actions.ts # Appointment CRUD
+│   ├── validation.ts         # Zod schemas
+│   └── utils.ts              # Helper functions
+├── prisma/                   # Database schema and migrations
+│   └── schema.prisma         # Prisma schema definition
+├── types/                    # TypeScript type definitions
+│   ├── index.d.ts            # Global types
+│   └── appwrite.types.ts     # Database model types
+├── constants/                # Application constants
+└── public/                   # Static assets
 ```
+
+---
+
+## 🔑 Key Features Explained
+
+### Smart Appointment Status
+
+Appointments are automatically assigned a status based on check-in date:
+- **Scheduled:** Check-in date is today or in the past
+- **Pending:** Check-in date is in the future
+- **Cancelled:** Manually cancelled by admin (soft delete)
+
+### OTP Verification Flow
+
+1. User enters name, email, and phone
+2. System generates 6-digit OTP and sends via email
+3. User enters OTP in elegant 6-box input
+4. Upon verification, success animation plays
+5. User is redirected to registration page
+
+### File Upload System
+
+- **ID Document:** Uploaded to Cloudinary and URL stored in database
+- **Customer Photo:** Optimized and stored via Cloudinary CDN
+- **Digital Signature:** Captured using signature pad, uploaded as image
+- All uploads show real-time progress toasts
+
+### Admin Security
+
+- **Session-based authentication:** Passkey required on every new browser session
+- **No persistent storage:** Authentication clears when browser/tab closes
+- **Logout functionality:** Admins can manually logout anytime
+- **Loading states:** Smooth transitions with spinners during authentication
+
+---
+
+## 📊 Database Schema
+
+The application uses three main models:
+
+### Customer
+- Basic user information (name, email, phone)
+- OTP verification fields
+- Timestamps
+
+### CustomerDetail
+- Extended profile information
+- Document URLs (ID, photo, signature)
+- Consent fields
+- Address and nationality info
+
+### Appointment
+- Booking information (dates, rooms, purpose)
+- Status tracking (scheduled/pending/cancelled)
+- Cancellation reason
+- Foreign key to Customer
+
+---
+
+## 🎨 UI/UX Highlights
+
+- **Toast Notifications:** Real-time feedback for all operations
+- **Loading Spinners:** Visual indicators for async operations
+- **Form Validation:** Instant feedback with error messages
+- **Responsive Design:** Works perfectly on mobile, tablet, and desktop
+- **Accessibility:** Keyboard navigation and screen reader support
+- **Dark Theme:** Modern dark color scheme throughout
 
 ---
 
@@ -190,15 +313,24 @@ The project follows a standard Next.js `app` directory structure:
 
 This project is licensed under the MIT License. See the `LICENSE` file for more details.
 
-<!-- CREATE A LICENSE FILE IF YOU DON'T HAVE ONE -->
-<!-- Example:
-## 📄 License
-Distributed under the MIT License. See `LICENSE.txt` for more information.
--->
+---
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/mayank-1007/rephelp/issues).
+
+---
+
+## 📧 Contact
+
+**Mayank Manchanda**
+- GitHub: [@mayank-1007](https://github.com/mayank-1007)
+- Email: mayankmanchanda2005@gmail.com
 
 ---
 
 <div align="center">
   <p>Developed with ❤️ by <strong>Mayank Manchanda</strong></p>
+  <p>⭐ Star this repo if you find it helpful!</p>
 </div>
 

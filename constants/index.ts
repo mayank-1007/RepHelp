@@ -904,6 +904,10 @@ export const CustomerFormDefaultValues = {
   occupation: "",
   emergencyContactName: "",
   emergencyContactNumber: "",
+  state: "",
+  district: "",
+  treatmentConsent: false,
+  disclosureConsent: false,
   privacyConsent: false,
 };
 

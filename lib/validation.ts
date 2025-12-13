@@ -60,6 +60,10 @@ export const CustomerFormValidation = z.object({
     .string()
     .min(2, "Policy number must be at least 2 characters")
     .max(50, "Policy number must be at most 50 characters").optional(),
+  state: z.string().optional(),
+  district: z.string().optional(),
+  treatmentConsent: z.boolean().default(false).optional(),
+  disclosureConsent: z.boolean().default(false).optional(),
   privacyConsent: z
     .boolean()
     .default(false)
@@ -69,27 +73,25 @@ export const CustomerFormValidation = z.object({
 });
 
 export const CreateBookingSchema = z.object({
-  schedule: z.coerce.date(),
-  room_type: z.string(),
+  checkInDate: z.coerce.date(),
+  checkOutDate: z.coerce.date().optional(),
+  numberOfRooms: z.string(),
   purpose: z
     .string()
-    .min(2, "Reason must be at least 2 characters")
-    .max(500, "Reason must be at most 500 characters"),
+    .min(2, "Purpose must be at least 2 characters")
+    .max(500, "Purpose must be at most 500 characters"),
   note: z.string().optional(),
 });
 
 export const ScheduleBookingSchema = z.object({
-  schedule: z.coerce.date(),
-  reason: z.string().optional(),
+  checkInDate: z.coerce.date(),
+  checkOutDate: z.coerce.date().optional(),
   note: z.string().optional(),
-  Status: z.string().optional(),
+  status: z.string().optional(),
   cancellationReason: z.string().optional(),
 });
 
 export const CancelBookingSchema = z.object({
-  schedule: z.coerce.date(),
-  reason: z.string().optional(),
-  note: z.string().optional(),
   cancellationReason: z
     .string()
     .min(2, "Reason must be at least 2 characters")

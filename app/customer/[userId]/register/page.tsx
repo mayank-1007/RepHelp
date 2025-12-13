@@ -5,6 +5,11 @@ import RegisterForm from "@/components/form/RegisterForm";
 import { getUser } from "@/lib/actions/customer.actions";
 const Register = async ({ params: { userId } }: SearchParamProps) => {
   const user = await getUser(userId);
+  
+  if (!user) {
+    return <div>User not found</div>;
+  }
+  
   return (
     <div className="flex">
       <section className="remove-scrollbar container">
@@ -22,7 +27,7 @@ const Register = async ({ params: { userId } }: SearchParamProps) => {
             </span>
           </div>
           <RegisterForm user={user} />
-          <p className="copyright py-12">©️ 2024 RepHelp</p>
+          <p className="copyright py-12">©️ <span>{new Date().getFullYear()}</span> RepHelp</p>
         </div>
       </section>
       <Image

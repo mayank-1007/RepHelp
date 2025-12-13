@@ -10,6 +10,8 @@ import { Form } from "@/components/ui/form";
 import CustomFormField from "@/components/CustomFormField";
 import SubmitButton from "@/components/SubmitButton";
 import { Input } from "@/components/ui/input";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { toast } from "sonner";
 // import { UserFormValidation } from "@/lib/validation";
 import { useState } from "react";
 import { useRouter } from "next/navigation"; // Updated import for Next.js App Router
@@ -19,6 +21,7 @@ import {
   Dialog,
   DialogTrigger,
   DialogContent,
+  DialogHeader,
   DialogTitle,
   DialogDescription,
   DialogFooter,
@@ -31,11 +34,11 @@ export enum FormFieldType {
   PHONE_INPUT = "phoneInput",
   CHECKBOX = "checkbox",
   DATE_PICKER = "datePicker",
-  DROPDOWN = "dropdown",
   SELECT = "select",
   SKELETON = "skeleton",
 }
 
+// Define the validation schema
 const UserFormValidation = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
@@ -46,6 +49,7 @@ export default function CustomerForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
   const [otp, setOtp] = useState("");
   const [userId, setUserId] = useState("");
   const [testHover, setTestHover] = useState(false);
@@ -74,42 +78,48 @@ export default function CustomerForm() {
 
       if (user) {
         setUserId(user.$id);
-        // If using demo credentials, skip OTP and go straight to register
-        if (isTestCredentials(data)) {
-          setIsLoading(false);
-          return router.push(`/customer/${user.$id}/register`);
-        }
-
-        const otpResponse = await sendOtp(
-          data.phone,
-          user.$id,
-          data.email,
-          data.name
-        );
+        toast.info("Sending verification code...");
+        
+        const otpResponse = await sendOtp(data.phone, user.$id, data.email,data.name);
 
         if (otpResponse.success) {
           setOtpSent(true);
+          toast.success("Verification code sent to your phone!");
         } else {
-          console.error("Failed to send OTP");
+          toast.error("Failed to send verification code. Please try again.");
         }
       }
     } catch (error) {
       console.log(error);
+      toast.error("Something went wrong. Please try again.");
     }
     setIsLoading(false);
   }
 
   async function handleOtpSubmit() {
+    if (otp.length !== 6) {
+      toast.error("Please enter a valid 6-digit OTP");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const verifyResponse = await verifyOtp(userId, otp);
       if (verifyResponse.success) {
-        router.push(`/customer/${userId}/register`);
+        toast.success("OTP verified successfully!");
+        setOtpVerified(true);
+        
+        // Wait 1 second before redirecting so user sees success message
+        setTimeout(() => {
+          router.push(`/customer/${userId}/register`);
+        }, 1000);
       } else {
-        console.error("Failed to verify OTP", verifyResponse.error);
+        toast.error("Invalid OTP. Please try again.");
+        setOtp("");
       }
     } catch (error) {
       console.log(error);
+      toast.error("Failed to verify OTP");
     }
     setIsLoading(false);
   }
@@ -173,27 +183,73 @@ export default function CustomerForm() {
       </form>
 
       <Dialog open={otpSent} onOpenChange={setOtpSent}>
-  <DialogTrigger asChild>
-    <Button variant="ghost" className="hidden">
-      Open
-    </Button>
-  </DialogTrigger>
-  <DialogContent className="bg-green-600"> {/* Add your background color class here */}
-    <DialogTitle>Enter OTP</DialogTitle>
-    <DialogDescription>
-      Please enter the OTP sent to your phone.
-    </DialogDescription>
-    <Input
-      value={otp}
-      onChange={(e) => setOtp(e.target.value)}
-      placeholder="Enter OTP"
-      className="mb-4"
-    />
-    <DialogFooter>
-      <Button onClick={handleOtpSubmit}>Verify OTP</Button>
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
+        <DialogTrigger asChild>
+          <Button variant="ghost" className="hidden">
+            Open
+          </Button>
+        </DialogTrigger>
+        <DialogContent
+          className="shad-dialog sm:max-w-md"
+          onEscapeKeyDown={(e: any) => e.preventDefault()}
+          onPointerDownOutside={(e: any) => e.preventDefault()}
+        >
+          <DialogHeader className="mb-4 space-y-3">
+            <DialogTitle className="text-center text-2xl font-bold">Verify Your Identity</DialogTitle>
+            <DialogDescription className="text-center">
+              We&apos;ve sent a 6-digit verification code to your phone.
+            </DialogDescription>
+          </DialogHeader>
+
+          {otpVerified ? (
+            <div className="flex flex-col items-center space-y-4 py-8">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-600">
+                <svg className="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <p className="text-lg font-semibold text-green-200">Verified Successfully!</p>
+              <p className="text-sm text-gray-500">Redirecting you to registration...</p>
+            </div>
+          ) : (
+            <>
+              <div className="">
+                <InputOTP
+                  maxLength={6}
+                  value={otp}
+                  onChange={(value) => setOtp(value)}
+                  disabled={isLoading}
+                >
+                  <InputOTPGroup className="shad-otp">
+                    <InputOTPSlot className="shad-otp-slot" index={0} />
+                    <InputOTPSlot className="shad-otp-slot" index={1} />
+                    <InputOTPSlot className="shad-otp-slot" index={2} />
+                    <InputOTPSlot className="shad-otp-slot" index={3} />
+                    <InputOTPSlot className="shad-otp-slot" index={4} />
+                    <InputOTPSlot className="shad-otp-slot" index={5} />
+                  </InputOTPGroup>
+                </InputOTP>
+              </div>
+
+              <DialogFooter className="flex flex-col gap-3">
+                <Button 
+                  onClick={handleOtpSubmit} 
+                  disabled={isLoading || otp.length !== 6}
+                  className="w-full shad-primary-btn"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Verifying...
+                    </div>
+                  ) : (
+                    "Verify & Continue"
+                  )}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
     </Form>
   );

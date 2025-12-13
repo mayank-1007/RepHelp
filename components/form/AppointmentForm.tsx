@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { RadioGroup } from "../ui/radio-group";
 import { RadioGroupItem } from "../ui/radio-group";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -22,8 +22,10 @@ import { RoomNumber, roomTypes, PurposeOptions } from "@/constants";
 import {
   createAppointment,
   updateAppointment,
+  getAppointment,
 } from "@/lib/actions/appointment.actions";
-import { CreateBookingSchema } from "@/lib/validation"; // Import schema directly
+import { CreateBookingSchema } from "@/lib/validation";
+import { toast } from "sonner";
 
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -34,9 +36,15 @@ import { Form } from "../ui/form";
 
 
 export const AppointmentForm = ({
-  userId
+  userId,
+  appointmentId,
+  type,
+  onSuccess,
 } : {
     userId: string;
+    appointmentId?: string;
+    type?: "schedule" | "cancel";
+    onSuccess?: () => void;
   }) => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -44,36 +52,72 @@ export const AppointmentForm = ({
   const form = useForm<z.infer<typeof CreateBookingSchema>>({
     resolver: zodResolver(CreateBookingSchema),
     defaultValues: {
-      room_type: "",
-      schedule: new Date(Date.now()),
+      numberOfRooms: "",
+      checkInDate: new Date(Date.now()),
       purpose: "",
       note: "",
     },
   });
 
-  const onSubmit = async (values: any) => {
+  // Load existing appointment data for rescheduling
+  useEffect(() => {
+    if (appointmentId && type === "schedule") {
+      setIsLoading(true);
+      getAppointment(appointmentId).then((appointment) => {
+        if (appointment) {
+          form.reset({
+            numberOfRooms: appointment.numberOfRooms || "",
+            checkInDate: appointment.checkInDate ? new Date(appointment.checkInDate) : new Date(),
+            checkOutDate: appointment.checkOutDate ? new Date(appointment.checkOutDate) : undefined,
+            purpose: appointment.purpose,
+            note: appointment.note || "",
+          });
+        }
+        setIsLoading(false);
+      });
+    }
+  }, [appointmentId, type]);
+
+  const onSubmit = async (values: z.infer<typeof CreateBookingSchema>) => {
     setIsLoading(true);
-    console.log("hello"); // Check if this is logged
-    console.log(values);
     try {
-        const appointment = {
-          userId: userId,
-          room_type: values.room_type,
-          schedule: new Date(values.schedule),
-          purpose: values.purpose || "",
-          note: values.note || "", // Ensure note is always a string
-        };
+        // If rescheduling (has appointmentId and type is schedule)
+        if (appointmentId && type === "schedule") {
+          await updateAppointment({
+            appointmentId,
+            appointment: {
+              numberOfRooms: values.numberOfRooms,
+              checkInDate: values.checkInDate.toISOString(),
+              checkOutDate: values.checkOutDate?.toISOString(),
+              purpose: values.purpose,
+              note: values.note || "",
+            },
+          });
+          toast.success("Appointment rescheduled successfully");
+          onSuccess?.();
+        } else {
+          // Creating new appointment
+          const appointment = {
+            customerId: userId,
+            numberOfRooms: values.numberOfRooms,
+            checkInDate: values.checkInDate.toISOString(),
+            checkOutDate: values.checkOutDate?.toISOString(),
+            purpose: values.purpose,
+            note: values.note || "",
+          };
 
-        const newAppointment = await createAppointment(appointment);
+          const newAppointment = await createAppointment(appointment);
 
-        if (newAppointment) {
-          form.reset();
-          router.push(
-            `/customer/${userId}/new-booking/success?appointmentId=${newAppointment.$id}`,
-          );
+          if (newAppointment) {
+            form.reset();
+            router.push(
+              `/customer/${userId}/new-booking/success?appointmentId=${newAppointment.id}`,
+            );
+          }
         }
     } catch (error) {
       console.log(error);
+      toast.error(appointmentId ? "Failed to reschedule appointment" : "Failed to create appointment");
     }
     setIsLoading(false);
   };
@@ -85,14 +129,14 @@ export const AppointmentForm = ({
           <CustomFormField
               fieldType={FormFieldType.SELECT}
               control={form.control}
-              name="room_type"
-              label="Room Type"
-              placeholder="Select the room type"
+              name="numberOfRooms"
+              label="Number of Rooms"
+              placeholder="Select number of rooms"
             >
-              {roomTypes.map((room_type, i) => (
-                <SelectItem key={room_type + i} value={room_type}>
+              {["1", "2", "3", "4", "5+"].map((num, i) => (
+                <SelectItem key={num + i} value={num}>
                   <div className="flex cursor-pointer items-center gap-2">
-                    <p>{room_type}</p>
+                    <p>{num}</p>
                   </div>
                 </SelectItem>
               ))}
@@ -101,8 +145,17 @@ export const AppointmentForm = ({
             <CustomFormField
               fieldType={FormFieldType.DATE_PICKER}
               control={form.control}
-              name="schedule"
-              label="Expected CheckOut date and time"
+              name="checkInDate"
+              label="Check-in Date"
+              showTimeSelect
+              dateFormat="dd/MM/yyyy - h:mm aa"
+            />
+
+            <CustomFormField
+              fieldType={FormFieldType.DATE_PICKER}
+              control={form.control}
+              name="checkOutDate"
+              label="Check-out Date (Optional)"
               showTimeSelect
               dateFormat="dd/MM/yyyy - h:mm aa"
             />
@@ -141,7 +194,9 @@ export const AppointmentForm = ({
               />
             </div>
         </>
-        <SubmitButton isLoading={isLoading} >Submit</SubmitButton>
+        <SubmitButton isLoading={isLoading}>
+          {appointmentId ? "Reschedule Appointment" : "Submit"}
+        </SubmitButton>
       </form>
     </Form>
   );
