@@ -235,7 +235,7 @@ The project follows a standard Next.js `app` directory structure with Prisma ORM
 │   └── schema.prisma         # Prisma schema definition
 ├── types/                    # TypeScript type definitions
 │   ├── index.d.ts            # Global types
-│   └── appwrite.types.ts     # Database model types
+│   └── prisma.types.ts     # Database model types
 ├── constants/                # Application constants
 └── public/                   # Static assets
 ```
