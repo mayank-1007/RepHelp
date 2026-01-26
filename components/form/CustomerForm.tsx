@@ -57,9 +57,9 @@ export default function CustomerForm() {
   const form = useForm({
     resolver: zodResolver(UserFormValidation),
     defaultValues: {
-  name: "",
-  email: "",
-  phone: "",
+      name: "",
+      email: "",
+      phone: "",
     },
   });
 
@@ -77,10 +77,10 @@ export default function CustomerForm() {
       const user = await createUser(data);
 
       if (user) {
-        setUserId(user.$id);
+        setUserId(user.id);
         toast.info("Sending verification code...");
-        
-        const otpResponse = await sendOtp(data.phone, user.$id, data.email,data.name);
+
+        const otpResponse = await sendOtp(data.phone, user.id, data.email, data.name);
 
         if (otpResponse.success) {
           setOtpSent(true);
@@ -108,7 +108,7 @@ export default function CustomerForm() {
       if (verifyResponse.success) {
         toast.success("OTP verified successfully!");
         setOtpVerified(true);
-        
+
         // Wait 1 second before redirecting so user sees success message
         setTimeout(() => {
           router.push(`/customer/${userId}/register`);
@@ -130,27 +130,27 @@ export default function CustomerForm() {
         <section className="mb-12 space-y-4">
           <h1 className="header">Hi there 👋</h1>
           <p className="text-dark-700">Let&apos;s Book Your Room</p>
-            <div onMouseEnter={() => setTestHover(true)} onMouseLeave={() => setTestHover(false)} className="mt-4 rounded-md border border-dark-500 bg-dark-400 p-4 text-sm">
-              <p className="mb-2 font-medium">Quick demo login (no OTP):</p>
-              <ul className="list-disc pl-5">
-                <li>Name: <span className="font-mono">{TEST_CREDENTIALS.name}</span></li>
-                <li>Email: <span className="font-mono">{TEST_CREDENTIALS.email}</span></li>
-                <li>Phone: <span className="font-mono">{TEST_CREDENTIALS.phone}</span></li>
-              </ul>
-              <div className="mt-3 flex gap-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    form.setValue("name", TEST_CREDENTIALS.name);
-                    form.setValue("email", TEST_CREDENTIALS.email);
-                    form.setValue("phone", TEST_CREDENTIALS.phone);
-                  }}
-                >
-                  Autofill demo details
-                </Button>
-              </div>
+          <div onMouseEnter={() => setTestHover(true)} onMouseLeave={() => setTestHover(false)} className="mt-4 rounded-md border border-dark-500 bg-dark-400 p-4 text-sm">
+            <p className="mb-2 font-medium">Quick demo login (no OTP):</p>
+            <ul className="list-disc pl-5">
+              <li>Name: <span className="font-mono">{TEST_CREDENTIALS.name}</span></li>
+              <li>Email: <span className="font-mono">{TEST_CREDENTIALS.email}</span></li>
+              <li>Phone: <span className="font-mono">{TEST_CREDENTIALS.phone}</span></li>
+            </ul>
+            <div className="mt-3 flex gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => {
+                  form.setValue("name", TEST_CREDENTIALS.name);
+                  form.setValue("email", TEST_CREDENTIALS.email);
+                  form.setValue("phone", TEST_CREDENTIALS.phone);
+                }}
+              >
+                Autofill demo details
+              </Button>
             </div>
+          </div>
         </section>
         <CustomFormField
           fieldType={FormFieldType.INPUT}
@@ -231,8 +231,8 @@ export default function CustomerForm() {
               </div>
 
               <DialogFooter className="flex flex-col gap-3">
-                <Button 
-                  onClick={handleOtpSubmit} 
+                <Button
+                  onClick={handleOtpSubmit}
                   disabled={isLoading || otp.length !== 6}
                   className="w-full shad-primary-btn"
                 >
