@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/select";
 import { FormControl } from "./ui/form";
 import { Button } from "./ui/button";
+import Tesseract from 'tesseract.js';
+import { toast } from "sonner";
 
 interface DocumentScanPopoverProps {
   onScanComplete: (data: any) => void;
@@ -34,6 +36,7 @@ export const DocumentScanPopover: React.FC<DocumentScanPopoverProps> = ({
   const [capturedImages, setCapturedImages] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [documentType, setDocumentType] = useState<string>("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const webcamRef = useRef<Webcam>(null);
 
@@ -64,50 +67,98 @@ export const DocumentScanPopover: React.FC<DocumentScanPopoverProps> = ({
       setShowPopover(false);
     }
   };
-  const removeHindi = (text: string): string =>{
+  const removeHindi = (text: string): string => {
     return text.replace(/[^\x00-\x7F]/g, '');
   }
-  
 
-function extractLicenseData(text: string): LicenseData | null {
+
+  function extractLicenseData(text: string): LicenseData | null {
     // Regex patterns
-    const namePattern = /Name:\s*([A-Z\s]+)(?=\n)/;
-    const dobPattern = /Date of Birth:\s*(\d{2}-\d{2}-\d{4})/;
+    const namePattern = /Name:\s*([A-Z\s]+)(?=\n)/i;
+    const dobPattern = /Date of Birth:\s*(\d{2}-\d{2}-\d{4})/i;
     const idPattern = /\b([A-Z]{2}\d{2}\s*\d{11})\b/;
-    const addressPattern = /Address\s*([\w\s,]*\d{6})/;
+    const addressPattern = /Address\s*([\w\s,]*\d{6})/i;
+
+    // Additional generic patterns for fallback
+    const genericDobPattern = /(\d{2}[\/-]\d{2}[\/-]\d{4})/;
 
     // Extracting data
     const nameMatch = text.match(namePattern);
-    const dobMatch = text.match(dobPattern);
+    const dobMatch = text.match(dobPattern) || text.match(genericDobPattern);
     const idMatch = text.match(idPattern);
     const addressMatch = text.match(addressPattern);
 
     return {
-        name: nameMatch?nameMatch[1].trim():"",
-        dateOfBirth: dobMatch?dobMatch[1]:"",
-        identificationNo: idMatch?idMatch[1].replace(/\s/g, ''):"",
-        address: addressMatch?addressMatch[1].trim():""
+      name: nameMatch ? nameMatch[1].trim() : "",
+      dateOfBirth: dobMatch ? dobMatch[1] : "",
+      identificationNo: idMatch ? idMatch[1].replace(/\s/g, '') : "",
+      address: addressMatch ? addressMatch[1].trim() : ""
     };
-    return null;
-}
+  }
 
   const handleRemoveImage = (index: number) => {
     setCapturedImages((prevImages) => prevImages.filter((_, i) => i !== index));
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
+  const performTesseractOCR = async (image: string) => {
+    try {
+      console.log("Fallback to Tesseract.js");
+      toast.info("Attempting local OCR...");
+
+      const result = await Tesseract.recognize(
+        image,
+        'eng',
+        {
+          logger: (m: any) => console.log(m),
+        }
+      );
+
+      console.log("Tesseract Result:", result);
+      const text = removeHindi(result.data.text);
+      console.log("Cleaned Text:", text);
+
+      const extractedData = extractLicenseData(text);
+      console.log("Extracted Data:", extractedData);
+
+      if (extractedData) {
+        // Map to the format expected by the form
+        onScanComplete({
+          name: extractedData.name,
+          dob: extractedData.dateOfBirth,
+          idNumber: extractedData.identificationNo,
+          address: extractedData.address
+        });
+        toast.success("OCR completed successfully!");
+      } else {
+        toast.error("Could not extract data from image.");
+      }
+
+    } catch (err) {
+      console.error("Tesseract Error:", err);
+      toast.error("Local OCR failed as well.");
+    }
+  };
+
   const handleOCR = useCallback(async () => {
+    if (capturedImages.length === 0) {
+      toast.error("Please capture or upload an image first.");
+      return;
+    }
+
     console.log("Starting OCR process");
-  
+    setIsProcessing(true);
+    toast.loading("Processing image...");
+
     for (let image of capturedImages) {
       try {
         // Convert base64 to Blob
         const blob = await fetch(image).then((res) => res.blob());
-  
+
         // Prepare the API request
         const data = new FormData();
         data.append('image', blob, 'image.jpg'); // Use 'image' as the field name
-  
+
         const options = {
           method: 'POST',
           headers: {
@@ -116,26 +167,48 @@ function extractLicenseData(text: string): LicenseData | null {
           },
           body: data
         };
-  
+
+        console.log("Attempting RapidAPI OCR...");
         const response = await fetch('https://ocr43.p.rapidapi.com/v1/results', options);
-  
+
         if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Error response from OCR API:', errorText);
-          return;
+          throw new Error(`RapidAPI failed with status: ${response.status}`);
         }
-  
+
         const result = await response.json();
-  
+
         console.log('OCR API response:', result);
-        console.log('Text :', extractLicenseData(removeHindi(result.results[0].entities[0].objects[0].entities[0].text)));
-        onScanComplete(result);
+
+        if (result.results && result.results.length > 0) {
+          const text = removeHindi(result.results[0].entities[0].objects[0].entities[0].text);
+          console.log('Text :', text);
+          const extractedData = extractLicenseData(text);
+
+          if (extractedData) {
+            onScanComplete({
+              name: extractedData.name,
+              dob: extractedData.dateOfBirth,
+              idNumber: extractedData.identificationNo,
+              address: extractedData.address
+            });
+            toast.success("OCR completed successfully!");
+          }
+        } else {
+          throw new Error("RapidAPI returned empty results");
+        }
+
       } catch (err) {
-        console.error("Error during OCR:", err);
+        console.error("RapidAPI Error:", err);
+        toast.error("Cloud OCR failed, switching to local...");
+        // Fallback to Tesseract
+        await performTesseractOCR(image);
       }
     }
+
+    setIsProcessing(false);
+    toast.dismiss();
   }, [capturedImages, onScanComplete]);
-  
+
 
   return (
     <div className="p-4">
@@ -178,22 +251,13 @@ function extractLicenseData(text: string): LicenseData | null {
                     />
                     <Button
                       type="button"
-                      onClick={() => handleRemoveImage(index)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveImage(index);
+                      }}
                       className="mt-2 bg-red-500 text-white py-1 px-3 rounded"
                     >
-                      Remove Image {index + 1}
-                    </Button>
-                  </div>
-                ))}
-                {files.map((file, index) => (
-                  <div key={index} className="flex flex-col items-center mb-4">
-                    <p className="text-white">{file.name}</p>
-                    <Button
-                      type="button"
-                      onClick={() => handleRemoveImage(index)}
-                      className="mt-2 bg-red-500 text-white py-1 px-3 rounded"
-                    >
-                      Remove File {index + 1}
+                      Remove
                     </Button>
                   </div>
                 ))}
@@ -237,10 +301,9 @@ function extractLicenseData(text: string): LicenseData | null {
               >
                 Capture Image
               </Button>
-              ${`it's ight not to include 'File objects here`}
               <Input
                 type="file"
-                accept="image/*,.pdf"
+                accept="image/*"
                 onChange={handleFileUpload}
                 className="file-input mt-2"
               />
@@ -252,9 +315,10 @@ function extractLicenseData(text: string): LicenseData | null {
         <Button
           type="button"
           onClick={handleOCR}
-          className="bg-green-500 text / text-white py-2 px-4 rounded"
+          disabled={isProcessing}
+          className="bg-green-500 text-white py-2 px-4 rounded w-full"
         >
-          Start OCR Scanning
+          {isProcessing ? "Scanning..." : "Start OCR Scanning"}
         </Button>
       </div>
     </div>

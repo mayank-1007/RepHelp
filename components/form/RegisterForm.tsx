@@ -58,7 +58,7 @@ export default function RegisterForm({ user }: { user: User }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  
+
   const form = useForm<z.infer<typeof CustomerFormValidation>>({
     resolver: zodResolver(CustomerFormValidation),
     defaultValues: {
@@ -109,7 +109,7 @@ export default function RegisterForm({ user }: { user: User }) {
   const onSubmit = async (values: z.infer<typeof CustomerFormValidation>) => {
     console.log("Form submission started");
     setIsLoading(true);
-  
+
     try {
       let identificationDocUrl = '';
       let customerImageUrl = '';
@@ -120,12 +120,12 @@ export default function RegisterForm({ user }: { user: User }) {
         toast.info("Uploading identification document...");
         const formData = new FormData();
         formData.append('file', values.identificationDocument[0]);
-        
+
         const uploadResponse = await fetch('/api/upload', {
           method: 'POST',
           body: formData,
         });
-        
+
         if (uploadResponse.ok) {
           const data = await uploadResponse.json();
           identificationDocUrl = data.url;
@@ -140,12 +140,12 @@ export default function RegisterForm({ user }: { user: User }) {
         toast.info("Uploading customer photo...");
         const formData = new FormData();
         formData.append('file', values.customer_image[0]);
-        
+
         const uploadResponse = await fetch('/api/upload', {
           method: 'POST',
           body: formData,
         });
-        
+
         if (uploadResponse.ok) {
           const data = await uploadResponse.json();
           customerImageUrl = data.url;
@@ -172,19 +172,19 @@ export default function RegisterForm({ user }: { user: User }) {
         disclosureConsent: values.disclosureConsent === true,
         privacyConsent: values.privacyConsent === true,
       };
-      
+
       // Debugging statements
       console.log("Customer Data:", customerData);
-      
+
       const customer = await registerCustomer(customerData);
-      
+
       console.log("Customer registered successfully:", customer);
       toast.success("Registration completed successfully!");
-      
+
       // Ensure router push is reached
       console.log("Navigating to the new booking route");
       router.push(`/customer/${user.id}/new-booking`);
-      
+
     } catch (error) {
       console.log("An error occurred during form submission:", error);
       toast.error("Failed to complete registration. Please try again.");
@@ -442,6 +442,10 @@ export default function RegisterForm({ user }: { user: User }) {
             <h2 className="sub-header">Identification and Verfication</h2>
           </div>
 
+          <div className="mb-6">
+            <DocumentScanPopover onScanComplete={handleScanComplete} />
+          </div>
+
           <CustomFormField
             fieldType={FormFieldType.SELECT}
             control={form.control}
@@ -531,7 +535,7 @@ export default function RegisterForm({ user }: { user: User }) {
         </section>
 
         <SubmitButton isLoading={isLoading} >Welcome</SubmitButton>
-       
+
       </form>
     </Form>
   );
